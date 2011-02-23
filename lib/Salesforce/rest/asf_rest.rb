@@ -66,7 +66,7 @@ module Salesforce
         @rest_svr_url = @soap_url.gsub(/-api\S*/mi, "") + ".salesforce.com"
         puts 'rest_svr_url' + @rest_svr_url
 
-        Salesforce::Rest::AsfRest.setup(@oauth_token, @rest_svr_url, @version)
+        self.setup(@oauth_token, @rest_svr_url, @version)
       end
 
       # We are mocking OAuth type authentication. In our case, we use the
