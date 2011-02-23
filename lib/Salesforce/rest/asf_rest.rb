@@ -51,7 +51,7 @@ module Salesforce
       # it includes 'setup()' method in the 'test_helper' and Rails init file.
       # TODO, to be removed in the 1.0 version
       # usage ->     bootup_rest_adapter()
-      def bootup_rest_adapter()
+      def self.bootup_rest_adapter()
         require 'asf-soap-adapter'
         p "*" * 80
         p 'Set up code'
