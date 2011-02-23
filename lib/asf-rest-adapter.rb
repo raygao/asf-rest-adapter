@@ -56,28 +56,3 @@ require File.dirname(__FILE__) + '/salesforce/rest/classes/user.rb'
 require File.dirname(__FILE__) + '/salesforce/rest/classes/user_feed.rb'
 require File.dirname(__FILE__) + '/salesforce/rest/classes/user_role.rb'
 require File.dirname(__FILE__) + '/salesforce/rest/classes/user_profile_feed.rb'
-
-
-# Initialize the adapter, the 1st step of using the adapter. A good place to invoke
-# it includes 'setup()' method in the 'test_helper' and Rails init file.
-# TODO, to be removed in the 1.0 version
-def initalize_adapter()
-  require 'asf-soap-adapter'
-  p "*" * 80
-  p 'Set up code'
-  @u = Salesforce::User.first
-  @version = "v" + @u.connection.config[:api_version].to_s
-  puts "Sf User name is: " + @u.name
-
-  @oauth_token = @u.connection.binding.instance_variable_get("@session_id")
-  puts "oauth token is: " + @oauth_token
-
-  @soap_url = @u.connection.binding.instance_variable_get("@server").address
-  @rest_svr_url = @soap_url.gsub(/-api\S*/mi, "") + ".salesforce.com"
-  puts 'rest_svr_url' + @rest_svr_url
-
-  Salesforce::Rest::AsfRest.setup(@oauth_token, @rest_svr_url, @version)
-end
-
-#initalize_adapter()
-

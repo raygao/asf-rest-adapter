@@ -46,6 +46,29 @@ module Salesforce
 
       self.site = "https://na7.salesforce.com/services/data/v21.0/sobjects"
 
+
+      # Initializes the adapter, the 1st step of using the adapter. A good place to invoke
+      # it includes 'setup()' method in the 'test_helper' and Rails init file.
+      # TODO, to be removed in the 1.0 version
+      # usage ->     bootup_rest_adapter()
+      def bootup_rest_adapter()
+        require 'asf-soap-adapter'
+        p "*" * 80
+        p 'Set up code'
+        @u = Salesforce::User.first
+        @version = "v" + @u.connection.config[:api_version].to_s
+        puts "Sf User name is: " + @u.name
+
+        @oauth_token = @u.connection.binding.instance_variable_get("@session_id")
+        puts "oauth token is: " + @oauth_token
+
+        @soap_url = @u.connection.binding.instance_variable_get("@server").address
+        @rest_svr_url = @soap_url.gsub(/-api\S*/mi, "") + ".salesforce.com"
+        puts 'rest_svr_url' + @rest_svr_url
+
+        Salesforce::Rest::AsfRest.setup(@oauth_token, @rest_svr_url, @version)
+      end
+
       # We are mocking OAuth type authentication. In our case, we use the
       # SessionID obtained from the initial SOAP Web Services call - 'login()'
       # OAuth2 is geared toward website to website authentication.
@@ -159,7 +182,6 @@ module Salesforce
         return resp
       end
 
-
       # Memcached version of the get_meta_data() method
       def self.xget_meta_data()
         @@memcache_id =  self.name + "/meta_data"
@@ -213,7 +235,6 @@ module Salesforce
         end
       end
 
-
       # Memcached version of the describe_global() method
       def self.xdescribe_global()
         @@memcache_id =  self.name + "/describe_global"
@@ -241,7 +262,7 @@ module Salesforce
         return resp
       end
 
-     # Memcached version of the list_available_resources() method
+      # Memcached version of the list_available_resources() method
       def self.xlist_available_resources()
         @@memcache_id =  self.name + "/list_resources"
         if Rails.cache.exist? @@memcache_id
@@ -268,8 +289,6 @@ module Salesforce
         end
         return resp
       end
-
-
 
       # Memcached version of the get_version() method
       def self.xget_version()
@@ -298,7 +317,6 @@ module Salesforce
         end
         return resp
       end
-
 
       # Memcached version of the run_soql() method
       def self.xrun_soql(query)
@@ -329,7 +347,6 @@ module Salesforce
         end
         return resp
       end
-
 
       # Memcached version of the run_sosl() method
       def self.xrun_sosl(search)
