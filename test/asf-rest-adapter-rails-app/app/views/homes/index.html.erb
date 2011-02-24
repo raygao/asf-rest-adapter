@@ -1,0 +1,25 @@
+<h1>Listing homes</h1>
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Value</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @homes.each do |home| %>
+  <tr>
+    <td><%= home.name %></td>
+    <td><%= home.value %></td>
+    <td><%= link_to 'Show', home %></td>
+    <td><%= link_to 'Edit', edit_home_path(home) %></td>
+    <td><%= link_to 'Destroy', home, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Home', new_home_path %>

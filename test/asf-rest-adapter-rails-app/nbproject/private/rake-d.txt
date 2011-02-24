@@ -1,0 +1,90 @@
+about=List versions of all Rails frameworks and the environment
+db\:abort_if_pending_migrations=
+db\:charset=
+db\:collation=
+db\:create=Create the database from config/database.yml for the current Rails.env (use db:create:all to create all dbs in the config)
+db\:create\:all=
+db\:drop=Drops the database for the current Rails.env (use db:drop:all to drop all databases)
+db\:drop\:all=
+db\:fixtures\:identify=
+db\:fixtures\:load=Load fixtures into the current environment's database.  Load specific fixtures using FIXTURES=x,y. Load from subdirectory in test/fixtures using FIXTURES_DIR=z. Specify an alternative path (eg. spec/fixtures) using FIXTURES_PATH=spec/fixtures.
+db\:forward=
+db\:load_config=
+db\:migrate=Migrate the database (options: VERSION=x, VERBOSE=false).
+db\:migrate\:down=
+db\:migrate\:redo=
+db\:migrate\:reset=
+db\:migrate\:status=Display status of migrations
+db\:migrate\:up=
+db\:reset=
+db\:rollback=Rolls the schema back to the previous version (specify steps w/ STEP=n).
+db\:schema\:dump=Create a db/schema.rb file that can be portably used against any DB supported by AR
+db\:schema\:load=Load a schema.rb file into the database
+db\:seed=Load the seed data from db/seeds.rb
+db\:sessions\:clear=
+db\:sessions\:create=
+db\:setup=Create the database, load the schema, and initialize with the seed data (use db:reset to also drop the db first)
+db\:structure\:dump=Dump the database structure to an SQL file
+db\:test\:clone=
+db\:test\:clone_structure=
+db\:test\:load=
+db\:test\:prepare=
+db\:test\:purge=
+db\:version=Retrieves the current schema version number
+default=
+doc=
+doc/api=
+doc/api/index.html=
+doc/app=
+doc/app/index.html=
+doc\:app=Generate docs for the app -- also availble doc:rails, doc:guides, doc:plugins (options: TEMPLATE=/rdoc-template.rb, TITLE="Custom Title")
+doc\:clobber=
+doc\:clobber_app=
+doc\:clobber_plugins=
+doc\:clobber_rails=
+doc\:guides=
+doc\:plugins=
+doc\:rails=
+doc\:reapp=
+doc\:rerails=
+environment=
+log\:clear=Truncates all *.log files in log/ to zero bytes
+middleware=Prints out your Rack middleware stack
+notes=Enumerate all annotations (use notes:optimize, :fixme, :todo for focus)
+notes\:custom=Enumerate a custom annotation, specify with ANNOTATION=CUSTOM
+notes\:fixme=
+notes\:optimize=
+notes\:todo=
+rails\:freeze\:edge=
+rails\:freeze\:gems=
+rails\:template=Applies the template supplied by LOCATION=/path/to/template
+rails\:templates\:copy=
+rails\:unfreeze=
+rails\:update=Update both configs and public/javascripts from Rails (or use just update:javascripts or update:configs)
+rails\:update\:application_controller=
+rails\:update\:configs=
+rails\:update\:javascripts=
+rails\:update\:scripts=
+rails_env=
+routes=Print out all defined routes in match order, with names. Target specific controller with CONTROLLER=x.
+secret=Generate a cryptographically secure secret key (this is typically used to generate a secret for cookie sessions).
+stats=Report code statistics (KLOCs, etc) from the application
+test=Runs test:units, test:functionals, test:integration together (also available: test:benchmark, test:profile, test:plugins)
+test\:benchmark=
+test\:functionals=
+test\:integration=
+test\:plugins=
+test\:prepare=
+test\:profile=
+test\:recent=Run tests for recenttest:prepare / Test recent changes
+test\:uncommitted=Run tests for uncommittedtest:prepare / Test changes since last checkin (only Subversion and Git)
+test\:units=
+time\:zones\:all=Displays all time zones, also available: time:zones:us, time:zones:local -- filter with OFFSET parameter, e.g., OFFSET=-6
+time\:zones\:local=
+time\:zones\:us=
+tmp\:cache\:clear=
+tmp\:clear=Clear session, cache, and socket files from tmp/ (narrow w/ tmp:sessions:clear, tmp:cache:clear, tmp:sockets:clear)
+tmp\:create=Creates tmp directories for sessions, cache, sockets, and pids
+tmp\:pids\:clear=
+tmp\:sessions\:clear=
+tmp\:sockets\:clear=
