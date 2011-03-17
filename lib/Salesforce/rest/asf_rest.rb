@@ -333,12 +333,13 @@ module Salesforce
           return obj
         end
       end
-      # Run SOQL
+      # Run SOQL, automatically CGI::escape the query for you.
       def self.run_soql(query)
         headers @@auth_header
         #options = { :query => {:q => query}}
         class_name = self.name.gsub(/\S+::/mi, "")
-        path = "/services/data/#{@@api_version}/query?q=#{query}"
+        safe_query = CGI::escape(query)
+        path = "/services/data/#{@@api_version}/query?q=#{safe_query}"
         resp = get(path)
         #resp = get(path, options)
         if (resp.code != 200) || !resp.success?
@@ -363,7 +364,7 @@ module Salesforce
           return obj
         end
       end
-      # Run SOSL
+      # Run SOSL, do not use CGI::escape -> SF will complain about missing {braces}
       def self.run_sosl(search)
         headers @@auth_header
         options = { :query => {:q => search}}
