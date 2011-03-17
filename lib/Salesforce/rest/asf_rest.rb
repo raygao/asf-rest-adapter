@@ -350,6 +350,7 @@ module Salesforce
       end
 
       # Run SOQL, automatically CGI::escape the query for you.
+      # This is for a single user -> query, username, password
       def self.run_soql_for_an_user(query, username, password)
         login_svr = 'https://login.salesforce.com'
         api_version = '21.0'
@@ -402,6 +403,41 @@ module Salesforce
       # Run SOSL, do not use CGI::escape -> SF will complain about missing {braces}
       def self.run_sosl(search)
         headers @@auth_header
+        options = { :query => {:q => search}}
+        class_name = self.name.gsub(/\S+::/mi, "")
+        path = URI.escape("/services/data/#{@@api_version}/search/?q=#{search}")
+        resp = get(path, options)
+        if (resp.code != 200) || !resp.success?
+          message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
+          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
+        end
+        return resp
+      end
+
+      # Run SOSL, do not use CGI::escape -> SF will complain about missing {braces}
+      # This is for a single user -> Search_query, username, password
+      def self.run_sosl_for_an_user(search, username, password)
+        login_svr = 'https://login.salesforce.com'
+        api_version = '21.0'
+
+        uri = URI.parse(login_svr)
+        uri.path = "/services/Soap/u/" + (api_version).to_s
+        url = uri.to_s
+
+        binding = RForce::Binding.new(url, nil, nil)
+        soap_response = binding.login(username, password)
+        soap_server_url = soap_response.loginResponse.result.serverUrl
+        security_token = soap_response.loginResponse.result.sessionId
+        user_id = soap_response.loginResponse.result.userId
+        puts "binding user id is: " + user_id
+
+        rest_svr = soap_server_url.gsub(/-api\S*/mi, "") + ".salesforce.com"
+        version = "v" + api_version
+
+        setup(security_token, rest_svr, version)
+
+        headers @@auth_header
+        
         options = { :query => {:q => search}}
         class_name = self.name.gsub(/\S+::/mi, "")
         path = URI.escape("/services/data/#{@@api_version}/search/?q=#{search}")
