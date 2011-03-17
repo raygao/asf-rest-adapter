@@ -49,7 +49,9 @@ class Salesforce::Rest::RestFindTest < ActiveSupport::TestCase
   #SOQL query
   def test_run_soql
     puts "## run soql ##"
-    query = "SELECT+Name,+id,+BillingCity+from+Account"
+    #query = "SELECT+Name,+id,+BillingCity+from+Account"
+    query = "SELECT Name, id, BillingCity from Account"
+
     resp = Salesforce::Rest::AsfRest.xrun_soql(query)
 
     counter = 0
@@ -93,7 +95,7 @@ class Salesforce::Rest::RestFindTest < ActiveSupport::TestCase
     assert !resp.nil?
   end
 
-  # Get Resources available on this REST server 
+  # Get Resources available on this REST server
   def test_list_available_resources
     puts "## list_available_resources (retrieveable SF objects) ##"
     resp = Salesforce::Rest::AsfRest.xlist_available_resources()
