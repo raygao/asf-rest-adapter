@@ -50,8 +50,8 @@ module Salesforce
       # Initializes the adapter, the 1st step of using the adapter. A good place to invoke
       # it includes 'setup()' method in the 'test_helper' and Rails init file.
       # TODO, to be removed in the 1.0 version
-      # usage ->     bootup_rest_adapter()
-      def self.bootup_rest_adapter()
+      # usage ->     bootup_rest_adapter_old_adapter()
+      def self.bootup_rest_adapter_with_old_adapter()
         require 'asf-soap-adapter'
         p "*" * 80
         p 'Set up code'
@@ -67,6 +67,39 @@ module Salesforce
         puts 'rest_svr_url' + @rest_svr_url
 
         self.setup(@oauth_token, @rest_svr_url, @version)
+        return @oauth_token
+      end
+
+      # Initializes the adapter, using username, password. A good place to invoke
+      # it includes 'setup()' method in the 'test_helper' and Rails init files.
+      # usage ->     bootup_rest_adapter(username, password, api_version)
+      def self.bootup_rest_adapter(username, password, api_version)
+        p "*" * 80
+        p 'Set up code'
+
+        login_svr = 'https://login.salesforce.com'
+        api_version = api_version ? api_version : '21.0'
+
+        uri = URI.parse(login_svr)
+        uri.path = "/services/Soap/u/" + (api_version).to_s
+        url = uri.to_s
+
+        binding = RForce::Binding.new(url, nil, nil)
+        soap_response = binding.login(username, password)
+        soap_server_url = soap_response.loginResponse.result.serverUrl
+        security_token = soap_response.loginResponse.result.sessionId
+        user_id = soap_response.loginResponse.result.userId
+        puts "binding user id is: " + user_id
+
+        rest_svr = soap_server_url.gsub(/-api\S*/mi, "") + ".salesforce.com"
+        rest_version = "v" + api_version
+
+        self.setup(security_token, rest_svr, rest_version)
+        puts "oauth token is: " + security_token
+
+        puts 'rest_svr_url' + rest_svr
+
+        return security_token
       end
 
       # We are mocking OAuth type authentication. In our case, we use the
@@ -80,12 +113,12 @@ module Salesforce
       # self.abstract_class = true
 
       # Setup the adapter
-      def self.setup(oauth_token, base_url, api_version)
+      def self.setup(oauth_token, rest_svr, api_version)
         @@oauth_token = oauth_token
-        @@base_url = base_url
-        @@api_version = "v21.0"  #take a dynamic api server version
-        @@rest_svr_url = base_url + "/services/data/#{api_version}/sobjects"
-        @@ssl_port = 443  # TODO, a dynamic SSL port
+        @@rest_svr = rest_svr
+        @@api_version = api_version ? api_version : "v21.0"  #take a dynamic api server version
+        @@rest_svr_url = rest_svr + "/services/data/#{api_version}/sobjects"
+        @@ssl_port = 443  # TODO, right SF use port 443 for all HTTPS traffic.
 
         self.site = "https://" +  @@rest_svr_url
         connection.set_header("Authorization", "OAuth " + @@oauth_token)
@@ -104,7 +137,7 @@ module Salesforce
       #When this consistency is resolved, this method should be removed.
       def save
         data = ActiveSupport::JSON::encode(attributes)
-        http = Net::HTTP.new(@@base_url, @@ssl_port)
+        http = Net::HTTP.new(@@rest_svr, @@ssl_port)
         http.use_ssl = true        
         class_name = self.class.name.gsub(/\S+::/mi, "")
         #puts "Class name is: " + class_name
@@ -126,7 +159,7 @@ module Salesforce
       #Again the delete feature from ActiveResource does not work out of the box.
       #Using custom delete function
       def self.delete(id)
-        http = Net::HTTP.new(@@base_url, @@ssl_port)
+        http = Net::HTTP.new(@@rest_svr, @@ssl_port)
         http.use_ssl = true
         class_name = self.name.gsub(/\S+::/mi, "")
         path = "/services/data/#{@@api_version}/sobjects/#{class_name}/#{id}"
@@ -214,7 +247,7 @@ module Salesforce
       def self.update(id, serialized_json)
         #Again the delete feature from ActiveResource does not work out of the box.
         #Providing a custom update function
-        http = Net::HTTP.new(@@base_url, @@ssl_port)
+        http = Net::HTTP.new(@@rest_svr, @@ssl_port)
         http.use_ssl = true
         class_name = self.name.gsub(/\S+::/mi, "")        
         path = "/services/data/#{@@api_version}/sobjects/#{class_name}/#{id}"
@@ -416,7 +449,7 @@ module Salesforce
 
       # Run SOSL, do not use CGI::escape -> SF will complain about missing {braces}
       # This is for a single user -> Search_query, username, password
-      def self.run_sosl_for_an_user(search, username, password)
+      def self.run_sosl_for_an_user(search, token)
         login_svr = 'https://login.salesforce.com'
         api_version = '21.0'
 
