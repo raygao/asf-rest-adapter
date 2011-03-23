@@ -17,7 +17,22 @@ class ActiveSupport::TestCase
 
   def setup
 #    initalize_adapter()
-    Salesforce::Rest::AsfRest.bootup_rest_adapter()
+#    either use the classic ASF-SOAP-ADAPTER dependency
+    #Salesforce::Rest::AsfRest.bootup_rest_adapter_with_old_adapter()
+#   Or, use RFORCE to create a session directly.
+
+    username = 'your SF usermame'
+    password = 'SF password + token'
+    login_svr = 'https://login.salesforce.com'
+    api_version = '21.0'
+
+    query = "Select id, name from User"
+
+    puts "## run sosl ##"
+    search = "FIND+{test}"
+
+    security_token, rest_svr, rest_version = Salesforce::Rest::AsfRest.bootup_rest_adapter(username, password, api_version)
+
   end
 
   # Add more helper methods to be used by all tests here...

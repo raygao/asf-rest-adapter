@@ -16,7 +16,7 @@ class Salesforce::Rest::RestFindTest < ActiveSupport::TestCase
   def test_find_a_single_item
     #rest_acct = Salesforce::Rest::Account.find("001A0000009ajW7IAI")
     puts "## find an single object with SF OID ##"
-    rest_user = Salesforce::Rest::User.xfind("005A0000000FKy4IAG")
+    rest_user = Salesforce::Rest::User.find("005A0000000S2C7IAK")
     assert !rest_user.empty?
     puts "#" * 80
 
