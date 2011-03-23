@@ -40,3 +40,5 @@ sudo gem install asf-rest-adapter
 Copyright (c) 2011 Raymond Gao for (link:http://are4.us) Are4Us Technologies. See LICENSE.txt for
 further details.
 
+===end
+
