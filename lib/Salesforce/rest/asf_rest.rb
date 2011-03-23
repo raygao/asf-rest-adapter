@@ -63,11 +63,11 @@ module Salesforce
         puts "oauth token is: " + @oauth_token
 
         @soap_url = @u.connection.binding.instance_variable_get("@server").address
-        @rest_svr_url = @soap_url.gsub(/-api\S*/mi, "") + ".salesforce.com"
-        puts 'rest_svr_url' + @rest_svr_url
+        @rest_svr = @soap_url.gsub(/-api\S*/mi, "") + ".salesforce.com"
+        puts 'rest_svr' + @rest_svr
 
-        self.setup(@oauth_token, @rest_svr_url, @version)
-        return @oauth_token
+        self.setup(@oauth_token, @rest_svr, @version)
+        return [@oauth_token, @rest_svr, @version]
       end
 
       # Initializes the adapter, using username, password. A good place to invoke
@@ -97,9 +97,9 @@ module Salesforce
         self.setup(security_token, rest_svr, rest_version)
         puts "oauth token is: " + security_token
 
-        puts 'rest_svr_url' + rest_svr
+        puts 'rest_svr' + rest_svr
 
-        return security_token
+        return [security_token, rest_svr, rest_version]
       end
 
       # We are mocking OAuth type authentication. In our case, we use the
@@ -383,25 +383,8 @@ module Salesforce
       end
 
       # Run SOQL, automatically CGI::escape the query for you.
-      # This is for a single user -> query, username, password
-      def self.run_soql_for_an_user(query, username, password)
-        login_svr = 'https://login.salesforce.com'
-        api_version = '21.0'
-
-        uri = URI.parse(login_svr)
-        uri.path = "/services/Soap/u/" + (api_version).to_s
-        url = uri.to_s
-
-        binding = RForce::Binding.new(url, nil, nil)
-        soap_response = binding.login(username, password)
-        soap_server_url = soap_response.loginResponse.result.serverUrl
-        security_token = soap_response.loginResponse.result.sessionId
-        user_id = soap_response.loginResponse.result.userId
-        puts "binding user id is: " + user_id
-
-        rest_svr = soap_server_url.gsub(/-api\S*/mi, "") + ".salesforce.com"
-        version = "v" + api_version
-
+      # This is with given credentials -> query, security_token, rest_svr, version
+      def self.run_soql_with_credential(query, security_token, rest_svr, version)
         setup(security_token, rest_svr, version)
 
         headers @@auth_header
@@ -448,25 +431,8 @@ module Salesforce
       end
 
       # Run SOSL, do not use CGI::escape -> SF will complain about missing {braces}
-      # This is for a single user -> Search_query, username, password
-      def self.run_sosl_for_an_user(search, token)
-        login_svr = 'https://login.salesforce.com'
-        api_version = '21.0'
-
-        uri = URI.parse(login_svr)
-        uri.path = "/services/Soap/u/" + (api_version).to_s
-        url = uri.to_s
-
-        binding = RForce::Binding.new(url, nil, nil)
-        soap_response = binding.login(username, password)
-        soap_server_url = soap_response.loginResponse.result.serverUrl
-        security_token = soap_response.loginResponse.result.sessionId
-        user_id = soap_response.loginResponse.result.userId
-        puts "binding user id is: " + user_id
-
-        rest_svr = soap_server_url.gsub(/-api\S*/mi, "") + ".salesforce.com"
-        version = "v" + api_version
-
+      # This is with given credentials -> Search_query, security_token, rest_svr, version
+      def self.run_sosl_with_credential(search, security_token, rest_svr, version)
         setup(security_token, rest_svr, version)
 
         headers @@auth_header
