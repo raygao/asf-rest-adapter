@@ -37,15 +37,14 @@ module Salesforce
     # <sobject><objectDescribe><.....></objectDescribe><recentItems>...</recentItems></sobject>
     class AsfRest < ActiveResource::Base
       include HTTParty
-      # default REST API server
-
+      
+      # default REST API server for HTTParty
       base_uri "https://na7.salesforce.com"
       default_params :output => 'json'
       format :json
 
-
+      #ActiveResource setting
       self.site = "https://na7.salesforce.com/services/data/v21.0/sobjects"
-
 
       # Initializes the adapter, the 1st step of using the adapter. A good place to invoke
       # it includes 'setup()' method in the 'test_helper' and Rails init file.
@@ -120,9 +119,12 @@ module Salesforce
         @@rest_svr_url = rest_svr + "/services/data/#{api_version}/sobjects"
         @@ssl_port = 443  # TODO, right SF use port 443 for all HTTPS traffic.
 
+        #ActiveResource setting
         #self.site = "https://" +  @@rest_svr_url
         self.site = @@rest_svr_url
         connection.set_header("Authorization", "OAuth " + @@oauth_token)
+        
+        # To be used by HTTParty
         @@auth_header = { "Authorization" => "OAuth " + @@oauth_token, "content-Type" => 'application/json' }
         # either application/xml or application/json
         self.format = :json
@@ -385,16 +387,18 @@ module Salesforce
 
       # Run SOQL, automatically CGI::escape the query for you.
       # This is with given credentials -> query, security_token, rest_svr, version
-      def self.run_soql_with_credential(query, security_token, rest_svr, version)
-        setup(security_token, rest_svr, version)
-
-        headers @@auth_header
-        #options = { :query => {:q => query}}
-        class_name = self.name.gsub(/\S+::/mi, "")
+      def self.run_soql_with_credential(query, security_token, rest_svr, api_version)
+        #set base url of the rest server
+        base_uri rest_svr
+        #set the oauth token
+        auth_setting = { "Authorization" => "OAuth " + security_token, "content-Type" => 'application/json' }
+        header auth_setting
+        #set the path with appropriate api_version, include CGI escaping the query string
         safe_query = CGI::escape(query)
-        path = "/services/data/#{@@api_version}/query?q=#{safe_query}"
+        path = "/services/data/#{api_version}/query?q=#{safe_query}"
+
+        #get the result
         resp = get(path)
-        #resp = get(path, options)
         if (resp.code != 200) || !resp.success?
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
           Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
@@ -433,14 +437,17 @@ module Salesforce
 
       # Run SOSL, do not use CGI::escape -> SF will complain about missing {braces}
       # This is with given credentials -> Search_query, security_token, rest_svr, version
-      def self.run_sosl_with_credential(search, security_token, rest_svr, version)
-        setup(security_token, rest_svr, version)
+      def self.run_sosl_with_credential(search, security_token, rest_svr, api_version)
+        #set base url of the rest server
+        base_uri rest_svr
+        #set the oauth token
+        auth_setting = { "Authorization" => "OAuth " + security_token, "content-Type" => 'application/json' }
+        header auth_setting
 
-        headers @@auth_header
-        
-        options = { :query => {:q => search}}
-        class_name = self.name.gsub(/\S+::/mi, "")
-        path = URI.escape("/services/data/#{@@api_version}/search/?q=#{search}")
+        #set the path with appropriate api_version, with the search string
+        path = URI.escape("/services/data/#{api_version}/search/?q=#{search}")
+
+        #get the result
         resp = get(path, options)
         if (resp.code != 200) || !resp.success?
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
