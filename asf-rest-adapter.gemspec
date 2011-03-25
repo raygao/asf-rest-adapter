@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{asf-rest-adapter}
-  s.version = "0.2.1"
+  s.version = "0.2.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Raymond Gao @ Are4Us Technologies"]
-  s.date = %q{2011-03-23}
+  s.date = %q{2011-03-25}
   s.description = %q{REST based adapter for Salesforce}
   s.email = %q{raygao2000@yahoo.com}
   s.extra_rdoc_files = [
@@ -69,7 +69,6 @@ Gem::Specification.new do |s|
     "lib/asf-rest-adapter.rb",
     "nbproject/private/private.properties",
     "nbproject/private/private.xml",
-    "nbproject/private/rake-d.txt",
     "nbproject/project.properties",
     "nbproject/project.xml",
     "test/asf-rest-adapter-rails-app/.gitignore",

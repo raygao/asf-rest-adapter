@@ -1,0 +1,6 @@
+add your certs here and name them as below to avoid changing the 
+name in your script/server file:
+
+server.key
+server.crt
+server.csr
