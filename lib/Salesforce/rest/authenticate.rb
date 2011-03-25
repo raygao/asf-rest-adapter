@@ -15,7 +15,7 @@
 
 module Salesforce
   module Rest
-    module Authenticate
+    module Authentication
       # Initializes the adapter, using username, password. A good place to invoke
       # it includes 'setup()' method in the 'test_helper' and Rails init files.
       # usage ->     bootup_rest_adapter(username, password, api_version)
