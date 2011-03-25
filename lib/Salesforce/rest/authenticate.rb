@@ -16,7 +16,7 @@
 module Salesforce
   module Rest
 
-    class AsfRest < ActiveResource::Base
+    class AsfRest
       module Authentication
         # Initializes the adapter, using username, password. A good place to invoke
         # it includes 'setup()' method in the 'test_helper' and Rails init files.

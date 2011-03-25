@@ -17,7 +17,7 @@
 
 module Salesforce
   module Rest
-    class AsfRest < ActiveResource::Base
+    class AsfRest
       module ExtensionManager
         class << self
           # removing http://....../UID.xml
