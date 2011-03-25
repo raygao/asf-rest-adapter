@@ -47,8 +47,8 @@ module Salesforce
       self.site = "https://na7.salesforce.com/services/data/v21.0/sobjects"
 
       # set header for httparty
-      def self.set_headers (headers)
-        headers (headers)
+      def self.set_headers (auth_setting)
+        headers (auth_setting)
       end
 
       # Initializes the adapter, the 1st step of using the adapter. A good place to invoke
