@@ -397,7 +397,7 @@ module Salesforce
         base_uri rest_svr
         #set the oauth token
         auth_setting = { "Authorization" => "OAuth " + security_token, "content-Type" => 'application/json' }
-        set_headers(auth_setting)
+        Salesforce::Rest::AsfRest.set_headers(auth_setting)
         #set the path with appropriate api_version, include CGI escaping the query string
         safe_query = CGI::escape(query)
         path = "/services/data/#{api_version}/query?q=#{safe_query}"
@@ -447,7 +447,7 @@ module Salesforce
         base_uri rest_svr
         #set the oauth token
         auth_setting = { "Authorization" => "OAuth " + security_token, "content-Type" => 'application/json' }
-        set_headers(auth_setting)
+        Salesforce::Rest::AsfRest.set_headers(auth_setting)
 
         #set the path with appropriate api_version, with the search string
         path = URI.escape("/services/data/#{api_version}/search/?q=#{search}")
