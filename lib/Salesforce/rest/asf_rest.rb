@@ -51,6 +51,9 @@ module Salesforce
         headers (auth_setting)
       end
 
+      require 'asf_rest_authenticate'
+      include Authenticate
+
       # Initializes the adapter, the 1st step of using the adapter. A good place to invoke
       # it includes 'setup()' method in the 'test_helper' and Rails init file.
       # TODO, to be removed in the 1.0 version
