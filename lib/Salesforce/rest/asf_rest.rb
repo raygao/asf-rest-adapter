@@ -54,7 +54,6 @@ module Salesforce
       # load the Authentication module from the 'extension_manager.rb' file.
       #autoload :Authentication, 'authenticate'
       require File.expand_path(File.join(File.dirname(__FILE__), 'authenticate.rb'))
-      require 'authenticate'
       include Salesforce::Rest::Authentication
 
       # set header for httparty
