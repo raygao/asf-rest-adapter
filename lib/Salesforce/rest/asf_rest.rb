@@ -37,7 +37,7 @@ module Salesforce
     # <sobject><objectDescribe><.....></objectDescribe><recentItems>...</recentItems></sobject>
     class AsfRest < ActiveResource::Base
       include HTTParty
-      
+
       # default REST API server for HTTParty
       base_uri "https://na7.salesforce.com"
       default_params :output => 'json'
@@ -46,10 +46,32 @@ module Salesforce
       #ActiveResource setting
       self.site = "https://na7.salesforce.com/services/data/v21.0/sobjects"
 
-
       # set header for httparty
       def self.set_headers (auth_setting)
         headers (auth_setting)
+      end
+
+      # Initializes the adapter, the 1st step of using the adapter. A good place to invoke
+      # it includes 'setup()' method in the 'test_helper' and Rails init file.
+      # TODO, to be removed in the 1.0 version
+      # usage ->     bootup_rest_adapter_old_adapter()
+      def self.bootup_rest_adapter_with_old_adapter()
+        require 'asf-soap-adapter'
+        p "*" * 80
+        p 'Set up code'
+        @u = Salesforce::User.first
+        @version = "v" + @u.connection.config[:api_version].to_s
+        puts "Sf User name is: " + @u.name
+
+        @oauth_token = @u.connection.binding.instance_variable_get("@session_id")
+        puts "oauth token is: " + @oauth_token
+
+        @soap_url = @u.connection.binding.instance_variable_get("@server").address
+        @rest_svr = @soap_url.gsub(/-api\S*/mi, "") + ".salesforce.com"
+        puts 'rest_svr' + @rest_svr
+
+        self.setup(@oauth_token, @rest_svr, @version)
+        return [@oauth_token, @rest_svr, @version]
       end
 
       # Initializes the adapter, using username, password. A good place to invoke
@@ -84,30 +106,6 @@ module Salesforce
         return [security_token, rest_svr, rest_version]
       end
 
-
-      # Initializes the adapter, the 1st step of using the adapter. A good place to invoke
-      # it includes 'setup()' method in the 'test_helper' and Rails init file.
-      # TODO, to be removed in the 1.0 version
-      # usage ->     bootup_rest_adapter_old_adapter()
-      def self.bootup_rest_adapter_with_old_adapter()
-        require 'asf-soap-adapter'
-        p "*" * 80
-        p 'Set up code'
-        @u = Salesforce::User.first
-        @version = "v" + @u.connection.config[:api_version].to_s
-        puts "Sf User name is: " + @u.name
-
-        @oauth_token = @u.connection.binding.instance_variable_get("@session_id")
-        puts "oauth token is: " + @oauth_token
-
-        @soap_url = @u.connection.binding.instance_variable_get("@server").address
-        @rest_svr = @soap_url.gsub(/-api\S*/mi, "") + ".salesforce.com"
-        puts 'rest_svr' + @rest_svr
-
-        self.setup(@oauth_token, @rest_svr, @version)
-        return [@oauth_token, @rest_svr, @version]
-      end
-
       # We are mocking OAuth type authentication. In our case, we use the
       # SessionID obtained from the initial SOAP Web Services call - 'login()'
       # OAuth2 is geared toward website to website authentication.
@@ -130,12 +128,12 @@ module Salesforce
         #self.site = "https://" +  @@rest_svr_url
         self.site = @@rest_svr_url
         connection.set_header("Authorization", "OAuth " + @@oauth_token)
-        
+
         # To be used by HTTParty
         @@auth_header = { "Authorization" => "OAuth " + @@oauth_token, "content-Type" => 'application/json' }
         # either application/xml or application/json
         self.format = :json
- 
+
         return self
       end
 
@@ -148,7 +146,7 @@ module Salesforce
       def save
         data = ActiveSupport::JSON::encode(attributes)
         http = Net::HTTP.new(@@rest_svr, @@ssl_port)
-        http.use_ssl = true        
+        http.use_ssl = true
         class_name = self.class.name.gsub(/\S+::/mi, "")
         #puts "Class name is: " + class_name
         path = "/services/data/#{@@api_version}/sobjects/#{class_name}/"
@@ -165,7 +163,7 @@ module Salesforce
           return resp
         end
       end
-      
+
       #Again the delete feature from ActiveResource does not work out of the box.
       #Using custom delete function
       def self.delete(id)
@@ -259,7 +257,7 @@ module Salesforce
         #Providing a custom update function
         http = Net::HTTP.new(@@rest_svr, @@ssl_port)
         http.use_ssl = true
-        class_name = self.name.gsub(/\S+::/mi, "")        
+        class_name = self.name.gsub(/\S+::/mi, "")
         path = "/services/data/#{@@api_version}/sobjects/#{class_name}/#{id}"
         headers = {
           'Authorization' => "OAuth "+ @@oauth_token,
@@ -292,7 +290,7 @@ module Salesforce
           Rails.cache.write(@@memcache_id, obj.body)
           return obj
         end
-      end      
+      end
       # Describe global of the REST server
       def self.describe_global()
         headers @@auth_header
@@ -453,7 +451,7 @@ module Salesforce
 
         #set the path with appropriate api_version, with the search string
         path = URI.escape("/services/data/#{api_version}/search/?q=#{search}")
-        options = { :query => {:q => search}}
+
         #get the result
         resp = get(path, options)
         if (resp.code != 200) || !resp.success?
@@ -478,7 +476,7 @@ module Salesforce
           return obj
         end
       end
-      
+
       # Used for removing the .xml and .json extensions at the end of the URL link.
       class << self
         # removing http://....../UID.xml
@@ -492,7 +490,6 @@ module Salesforce
           "#{prefix(prefix_options)}#{collection_name}#{query_string(query_options)}"
         end
       end
-
     end
   end
 end
