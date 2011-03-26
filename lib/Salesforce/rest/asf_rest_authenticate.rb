@@ -11,7 +11,7 @@ module Authenticate
       # TODO, to be removed in the 1.0 version
       # usage ->     bootup_rest_adapter_old_adapter()
       def bootup_rest_adapter_with_old_adapter()
-        require 'asf-soap-adapter'
+        #require 'asf-soap-adapter'
         p "*" * 80
         p 'Set up code'
         @u = Salesforce::User.first
