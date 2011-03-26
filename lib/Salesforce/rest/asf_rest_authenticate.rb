@@ -1,4 +1,4 @@
-#add-on-module
+#aAuthentication module (methods) for the adapter
 puts ' loading asf_rest_authenticate module'
 module Authenticate
   # instance method
