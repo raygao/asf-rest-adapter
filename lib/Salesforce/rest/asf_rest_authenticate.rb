@@ -1,12 +1,8 @@
 #add-on-module
-puts ' add_on_module loaded.......'
+puts ' loading asf_rest_authenticate module'
 module Authenticate
   # instance method
-  def Who?
-    puts "calling who method of the GEM"
-    "#{self.type.name}(\##{self.id}): #{self.to_s}"
-  end
-
+  
   #class methods
   def self.included(base)
     class << base
@@ -63,12 +59,6 @@ module Authenticate
         puts 'rest_svr' + rest_svr
 
         return [security_token, rest_svr, rest_version]
-      end
-      
-
-
-      def public_opbk_method
-        puts "public static method called of the GEM"
       end
     end
   end
