@@ -47,10 +47,14 @@ module Salesforce
       self.site = "https://na7.salesforce.com/services/data/v21.0/sobjects"
 
       # load the ExtentionManager module from the 'extension_manager.rb' file.
-      autoload :ExtensionManager, File.expand_path('./extension_manager.rb')
+      #autoload :ExtensionManager, 'extension_manager'
+      require 'extension_manager'
+      include Salesforce::Rest::ExtensionManager
 
       # load the Authentication module from the 'extension_manager.rb' file.
-      autoload :Authentication, File.expand_path('./authenticate.rb')
+      #autoload :Authentication, 'authenticate'
+      require 'authenticate'
+      include Salesforce::Rest::Authentication
 
       # set header for httparty
       def self.set_headers (auth_setting)

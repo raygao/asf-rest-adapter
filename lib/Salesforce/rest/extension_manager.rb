@@ -17,21 +17,20 @@
 
 module Salesforce
   module Rest
-    class AsfRest
-      module ExtensionManager
-        class << self
-          # removing http://....../UID.xml
-          def element_path(id, prefix_options = {}, query_options = nil)
-            prefix_options, query_options = split_options(prefix_options) if query_options.nil?
-            "#{prefix(prefix_options)}#{collection_name}/#{id}#{query_string(query_options)}"
-          end
-          # removing http://....../UID.json
-          def collection_path(prefix_options = {}, query_options = nil)
-            prefix_options, query_options = split_options(prefix_options) if query_options.nil?
-            "#{prefix(prefix_options)}#{collection_name}#{query_string(query_options)}"
-          end
+    module ExtensionManager
+      class << self
+        # removing http://....../UID.xml
+        def element_path(id, prefix_options = {}, query_options = nil)
+          prefix_options, query_options = split_options(prefix_options) if query_options.nil?
+          "#{prefix(prefix_options)}#{collection_name}/#{id}#{query_string(query_options)}"
+        end
+        # removing http://....../UID.json
+        def collection_path(prefix_options = {}, query_options = nil)
+          prefix_options, query_options = split_options(prefix_options) if query_options.nil?
+          "#{prefix(prefix_options)}#{collection_name}#{query_string(query_options)}"
         end
       end
     end
   end
+
 end
