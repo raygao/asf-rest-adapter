@@ -52,7 +52,7 @@ module Salesforce
       end
 
       # Loading the Authenticate module
-      require File.dirname(__FILE__) + '/asf_rest_authenticate.rb'
+      require 'asf_rest_authenticate.rb'
       include Authenticate
 
       # We are mocking OAuth type authentication. In our case, we use the
