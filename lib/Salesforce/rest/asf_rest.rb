@@ -453,8 +453,9 @@ module Salesforce
 
         #set the path with appropriate api_version, with the search string
         path = URI.escape("/services/data/#{api_version}/search/?q=#{search}")
+        options = { :query => {:q => search}}
         #get the result
-        resp = get(path)
+        resp = get(path, options)
         if (resp.code != 200) || !resp.success?
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
           Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
