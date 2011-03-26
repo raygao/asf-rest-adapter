@@ -48,12 +48,12 @@ module Salesforce
 
       # load the ExtentionManager module from the 'extension_manager.rb' file.
       #autoload :ExtensionManager, 'extension_manager'
-      require File.expand_path(File.join(File.dirname(__FILE__), 'extension_manager.rb'))
+      require File.dirname(__FILE__) + 'extension_manager.rb'
       include Salesforce::Rest::ExtensionManager
 
       # load the Authentication module from the 'extension_manager.rb' file.
       #autoload :Authentication, 'authenticate'
-      require File.expand_path(File.join(File.dirname(__FILE__), 'authenticate.rb'))
+      require File.dirname(__FILE__) + 'authenticate.rb'
       include Salesforce::Rest::Authentication
 
       # set header for httparty
