@@ -54,6 +54,7 @@ module Salesforce
       require File.dirname(__FILE__) + '/asf_rest_authenticate.rb'
       include Authenticate
 
+=begin
       # Initializes the adapter, the 1st step of using the adapter. A good place to invoke
       # it includes 'setup()' method in the 'test_helper' and Rails init file.
       # TODO, to be removed in the 1.0 version
@@ -108,6 +109,8 @@ module Salesforce
 
         return [security_token, rest_svr, rest_version]
       end
+
+=end
 
       # We are mocking OAuth type authentication. In our case, we use the
       # SessionID obtained from the initial SOAP Web Services call - 'login()'
