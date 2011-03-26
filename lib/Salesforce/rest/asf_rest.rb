@@ -51,7 +51,7 @@ module Salesforce
         headers (auth_setting)
       end
 
-      require File.dirname(__FILE__) + 'asf_rest_authenticate.rb'
+      require File.dirname(__FILE__) + '/asf_rest_authenticate.rb'
       include Authenticate
 
       # Initializes the adapter, the 1st step of using the adapter. A good place to invoke
