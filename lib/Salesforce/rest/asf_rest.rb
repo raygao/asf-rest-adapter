@@ -104,7 +104,6 @@ module Salesforce
         resp = post(path, data, auth_headers)
 
 =begin
-
         data = ActiveSupport::JSON::encode(attributes)
         http = Net::HTTP.new(@@rest_svr, @@ssl_port)
         http.use_ssl = true
