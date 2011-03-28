@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{asf-rest-adapter}
-  s.version = "0.2.2"
+  s.version = "0.2.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Raymond Gao @ Are4Us Technologies"]
-  s.date = %q{2011-03-25}
+  s.date = %q{2011-03-28}
   s.description = %q{REST based adapter for Salesforce}
   s.email = %q{raygao2000@yahoo.com}
   s.extra_rdoc_files = [
@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
     "README.rdoc"
   ]
   s.files = [
+    ".DS_Store",
     ".document",
     "Gemfile",
     "Gemfile.lock",
@@ -25,8 +26,17 @@ Gem::Specification.new do |s|
     "Rakefile",
     "VERSION",
     "asf-rest-adapter.gemspec",
+    "lib/Salesforce/oauth2/enviornments/environment.rb",
+    "lib/Salesforce/oauth2/forcedotcom.rb",
+    "lib/Salesforce/oauth2/initializers/omniauth.rb",
+    "lib/Salesforce/oauth2/routes/routes.rb",
+    "lib/Salesforce/oauth2/templates/rails",
+    "lib/Salesforce/oauth2/templates/ssl_templates/README",
+    "lib/Salesforce/oauth2/templates/ssl_templates/server.crt",
+    "lib/Salesforce/oauth2/templates/ssl_templates/server.key",
     "lib/Salesforce/rest/asf_connection.rb",
     "lib/Salesforce/rest/asf_rest.rb",
+    "lib/Salesforce/rest/asf_rest_authenticate.rb",
     "lib/Salesforce/rest/asf_rest_error.rb",
     "lib/Salesforce/rest/classes/account.rb",
     "lib/Salesforce/rest/classes/account_feed.rb",
@@ -69,6 +79,7 @@ Gem::Specification.new do |s|
     "lib/asf-rest-adapter.rb",
     "nbproject/private/private.properties",
     "nbproject/private/private.xml",
+    "nbproject/private/rake-d.txt",
     "nbproject/project.properties",
     "nbproject/project.xml",
     "test/asf-rest-adapter-rails-app/.gitignore",
@@ -179,39 +190,6 @@ Gem::Specification.new do |s|
     "test/asf-rest-adapter-rails-app/test/unit/salesforce/user_role_test.rb",
     "test/asf-rest-adapter-rails-app/test/unit/salesforce/user_test.rb",
     "test/asf-rest-adapter-rails-app/test/unit/test_update_manual.rb",
-    "test/asf-rest-adapter-rails-app/vendor/cache/abstract-1.0.0.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/actionmailer-3.0.4.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/actionpack-3.0.4.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/activemodel-3.0.4.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/activerecord-3.0.4.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/activeresource-3.0.4.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/activesupport-3.0.4.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/arel-2.0.8.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/asf-rest-adapter-0.1.4.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/asf-soap-adapter-1.3.1.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/builder-2.1.2.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/crack-0.1.8.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/erubis-2.6.6.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/facets-2.8.4.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/hpricot-0.8.3.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/httparty-0.7.4.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/i18n-0.5.0.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/mail-2.2.15.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/memcache-client-1.8.5.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/mime-types-1.16.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/oauth-0.4.4.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/polyglot-0.3.1.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/rack-1.2.1.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/rack-mount-0.6.13.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/rack-test-0.5.7.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/rails-3.0.4.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/railties-3.0.4.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/rake-0.8.7.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/rforce-0.6.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/sqlite3-1.3.3.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/thor-0.14.6.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/treetop-1.4.9.gem",
-    "test/asf-rest-adapter-rails-app/vendor/cache/tzinfo-0.3.24.gem",
     "test/asf-rest-adapter-rails-app/vendor/plugins/.gitkeep",
     "test/helper.rb",
     "test/test_asf-rest-adapter.rb"
@@ -303,17 +281,20 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<jeweler>, ["~> 1.5.2"])
       s.add_runtime_dependency(%q<asf-soap-adapter>, [">= 0"])
       s.add_runtime_dependency(%q<httparty>, [">= 0"])
+      s.add_runtime_dependency(%q<omniauth>, [">= 0"])
     else
       s.add_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_dependency(%q<jeweler>, ["~> 1.5.2"])
       s.add_dependency(%q<asf-soap-adapter>, [">= 0"])
       s.add_dependency(%q<httparty>, [">= 0"])
+      s.add_dependency(%q<omniauth>, [">= 0"])
     end
   else
     s.add_dependency(%q<bundler>, ["~> 1.0.0"])
     s.add_dependency(%q<jeweler>, ["~> 1.5.2"])
     s.add_dependency(%q<asf-soap-adapter>, [">= 0"])
     s.add_dependency(%q<httparty>, [">= 0"])
+    s.add_dependency(%q<omniauth>, [">= 0"])
   end
 end
 
