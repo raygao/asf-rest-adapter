@@ -97,11 +97,11 @@ module Salesforce
         class_name = self.class.name.gsub(/\S+::/mi, "")
         path = "/services/data/#{@@api_version}/sobjects/#{class_name}/"
         data = Hash.new(ActiveSupport::JSON::encode(attributes))
-        headers = {
+        auth_headers = {
           'Authorization' => "OAuth "+ @@oauth_token,
           "content-Type" => 'application/json',
         }
-        resp = post(path, data, headers)
+        resp = post(path, data, auth_headers)
 
 =begin
 
