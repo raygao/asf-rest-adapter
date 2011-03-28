@@ -93,7 +93,8 @@ module Salesforce
       #The Extra/missing 'Object Name' causes this to break.
       #When this consistency is resolved, this method should be removed.
       def save
-        headers @@auth_header
+        #headers @@auth_header
+        #headers @@auth_header
         class_name = self.class.name.gsub(/\S+::/mi, "")
         path = "/services/data/#{@@api_version}/sobjects/#{class_name}/"
         data = Hash.new(ActiveSupport::JSON::encode(attributes))
