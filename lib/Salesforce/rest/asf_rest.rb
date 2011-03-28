@@ -93,6 +93,18 @@ module Salesforce
       #The Extra/missing 'Object Name' causes this to break.
       #When this consistency is resolved, this method should be removed.
       def save
+        headers @@auth_header
+        class_name = self.class.name.gsub(/\S+::/mi, "")
+        path = "/services/data/#{@@api_version}/sobjects/#{class_name}/"
+        data = Hash.new(ActiveSupport::JSON::encode(attributes))
+        headers = {
+          'Authorization' => "OAuth "+ @@oauth_token,
+          "content-Type" => 'application/json',
+        }
+        resp = post(path, data, headers)
+
+=begin
+
         data = ActiveSupport::JSON::encode(attributes)
         http = Net::HTTP.new(@@rest_svr, @@ssl_port)
         http.use_ssl = true
@@ -103,7 +115,8 @@ module Salesforce
           'Authorization' => "OAuth "+ @@oauth_token,
           "content-Type" => 'application/json',
         }
-        resp = http.post(path, data, headers)
+      resp = http.post(path, data, headers)
+=end        
         # HTTP code 201 means it was successfully saved.
         if resp.code != "201"
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]

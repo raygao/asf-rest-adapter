@@ -56,7 +56,7 @@ module Authenticate
         self.setup(security_token, rest_svr, rest_version)
         puts "oauth token is: " + security_token
 
-        puts 'rest_svr' + rest_svr
+        puts 'rest_svr: ' + rest_svr
 
         return [security_token, rest_svr, rest_version]
       end
