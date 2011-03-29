@@ -15,7 +15,7 @@ class Salesforce::Rest::RestCreateDeleteTest < ActiveSupport::TestCase
     @oauth_token = @u.connection.binding.instance_variable_get("@session_id")
     puts "oauth token is: " + @oauth_token
 
-    @soap_url = @u.connection.binding.instance_variable_get("@server").address
+    @soap_url = "https://" + @u.connection.binding.instance_variable_get("@server").address
     @rest_svr_url = @soap_url.gsub(/-api\S*/mi, "") + ".salesforce.com"
     puts 'rest_svr_url' + @rest_svr_url
 
@@ -31,16 +31,17 @@ class Salesforce::Rest::RestCreateDeleteTest < ActiveSupport::TestCase
       :BillingState => "NY", :ShippingCity => "New York")
     resp = new_acct.save()
 
-    assert (resp.code == "201")
+    assert (resp.code == 201)
     j = ActiveSupport::JSON
     @sf_oid = j.decode(resp.body)["id"]
     puts "New Object created: id -> "  + @sf_oid
 
     puts "--update that new account--"
     serialized_json = '{"BillingState":"WA"}'
-    http = Net::HTTP.new(@rest_svr_url, 443)
+    #http = Net::HTTP.new(@rest_svr_url, 443)
+    http = Net::HTTP.new('na7.salesforce.com', 443)
     http.use_ssl = true
-    
+
     class_name = "Account"
     path = "/services/data/v21.0/sobjects/#{class_name}/#{@sf_oid}"
     headers = {
@@ -48,7 +49,8 @@ class Salesforce::Rest::RestCreateDeleteTest < ActiveSupport::TestCase
       "content-Type" => 'application/json',
     }
     code = serialized_json
-    
+
+
     req = Net::HTTPGenericRequest.new("PATCH", true, true, path, headers)
 
     resp = http.request(req, code) { |response|  }
