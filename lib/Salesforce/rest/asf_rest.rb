@@ -207,9 +207,11 @@ module Salesforce
 
       #Update an object
       def self.update(id, serialized_json)
+        
         #Again the delete feature from ActiveResource does not work out of the box.
         #Providing a custom update function
-        http = Net::HTTP.new('na7.salesforce.com', @@ssl_port)
+        svr_url_4_http = @@rest_svr.gsub(/https:\/\//mi, "" )  #strip http:// prefix from the url. Otherwise, it will fail.
+        http = Net::HTTP.new(svr_url_4_http, @@ssl_port)
         #http = Net::HTTP.new('https://na7.salesforce.com', @@ssl_port)
         http.use_ssl = true
         class_name = self.name.gsub(/\S+::/mi, "")
@@ -222,8 +224,10 @@ module Salesforce
         #   format -> Net::HTTPGenericRequest.new(m, reqbody, resbody, path, initheader)
         req = Net::HTTPGenericRequest.new("PATCH", true, true, path, headers)
         resp = http.request(req, code) { |response|  }
-        # HTTP code 204 means it was successfully updated.
-        if resp.code != "204"
+
+
+        # HTTP code 204 means it was successfully updated. 204 for httparty, '204' for Net::HTTP
+        if resp.code != 204
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
           Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
         else
