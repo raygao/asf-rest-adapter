@@ -227,7 +227,7 @@ module Salesforce
 
 
         # HTTP code 204 means it was successfully updated. 204 for httparty, '204' for Net::HTTP
-        if resp.code != 204
+        if resp.code != '204'
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
           Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
         else
