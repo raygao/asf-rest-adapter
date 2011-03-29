@@ -25,7 +25,7 @@ Jeweler::Tasks.new do |gem|
   #  gem.add_development_dependency 'rspec', '> 1.2.3'
   gem.add_dependency('asf-soap-adapter')
   gem.add_dependency('httparty')
-  gem.add_dependency('omniauth')
+  #gem.add_dependency('omniauth')
 end
 Jeweler::RubygemsDotOrgTasks.new
 

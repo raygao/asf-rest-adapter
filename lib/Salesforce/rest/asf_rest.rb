@@ -18,6 +18,7 @@ require 'net/http'
 require 'active_resource'
 require 'httparty'
 
+
 module Salesforce
   module Rest
     # This is the mother class of all Salesforce REST objects
@@ -81,6 +82,7 @@ module Salesforce
         # To be used by HTTParty
         @@auth_header = { "Authorization" => "OAuth " + @@oauth_token, "content-Type" => 'application/json' }
         # either application/xml or application/json
+        base_uri rest_svr
         self.format = :json
 
         return self
@@ -93,32 +95,22 @@ module Salesforce
       #The Extra/missing 'Object Name' causes this to break.
       #When this consistency is resolved, this method should be removed.
       def save
-        #headers @@auth_header
-        #headers @@auth_header
+#        self.class.headers @@auth_header
+#        self.class.base_uri 'https://na7.salesforce.com'
         class_name = self.class.name.gsub(/\S+::/mi, "")
         path = "/services/data/#{@@api_version}/sobjects/#{class_name}/"
-        data = Hash.new(ActiveSupport::JSON::encode(attributes))
+        target = @@rest_svr + path
+        data = ActiveSupport::JSON::encode(attributes)
         auth_headers = {
           'Authorization' => "OAuth "+ @@oauth_token,
           "content-Type" => 'application/json',
         }
-        resp = post(path, data, auth_headers)
+        j = ActiveSupport::JSON
 
-=begin
-        data = ActiveSupport::JSON::encode(attributes)
-        http = Net::HTTP.new(@@rest_svr, @@ssl_port)
-        http.use_ssl = true
-        class_name = self.class.name.gsub(/\S+::/mi, "")
-        #puts "Class name is: " + class_name
-        path = "/services/data/#{@@api_version}/sobjects/#{class_name}/"
-        headers = {
-          'Authorization' => "OAuth "+ @@oauth_token,
-          "content-Type" => 'application/json',
-        }
-      resp = http.post(path, data, headers)
-=end        
+        resp = HTTParty.post(target, :body => data, :headers => auth_headers)
+
         # HTTP code 201 means it was successfully saved.
-        if resp.code != "201"
+        if resp.code != 201
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
           Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
         else
@@ -129,16 +121,16 @@ module Salesforce
       #Again the delete feature from ActiveResource does not work out of the box.
       #Using custom delete function
       def self.delete(id)
-        http = Net::HTTP.new(@@rest_svr, @@ssl_port)
-        http.use_ssl = true
         class_name = self.name.gsub(/\S+::/mi, "")
         path = "/services/data/#{@@api_version}/sobjects/#{class_name}/#{id}"
-        headers = {
-          'Authorization' => "OAuth "+ @@oauth_token
+        target = @@rest_svr + path
+        auth_headers = {
+          'Authorization' => "OAuth "+ @@oauth_token,
         }
+        resp = HTTParty.delete(target, :headers => auth_headers)
+
         # HTTP code 204 means it was successfully deleted.
-        resp = http.delete(path, headers)
-        if resp.code != "204"
+        if resp.code != 204
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
           Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
         else
@@ -217,7 +209,8 @@ module Salesforce
       def self.update(id, serialized_json)
         #Again the delete feature from ActiveResource does not work out of the box.
         #Providing a custom update function
-        http = Net::HTTP.new(@@rest_svr, @@ssl_port)
+        http = Net::HTTP.new('na7.salesforce.com', @@ssl_port)
+        #http = Net::HTTP.new('https://na7.salesforce.com', @@ssl_port)
         http.use_ssl = true
         class_name = self.name.gsub(/\S+::/mi, "")
         path = "/services/data/#{@@api_version}/sobjects/#{class_name}/#{id}"
