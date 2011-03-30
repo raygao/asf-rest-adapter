@@ -9,7 +9,7 @@ class Salesforce::TaskTest < ActiveSupport::TestCase
 
     @oauth_token = @u.connection.binding.instance_variable_get("@session_id")
     puts "oauth token is: " + @oauth_token
-    @rest_svr_url = "na7.salesforce.com"
+    @rest_svr_url = "https://na7.salesforce.com"
     Salesforce::Rest::AsfRest.setup(@oauth_token, @rest_svr_url, "v21.0")
   end
 
@@ -23,5 +23,5 @@ class Salesforce::TaskTest < ActiveSupport::TestCase
     puts class_name
     master_get_detail_info(class_name)
   end
-  
+
 end
