@@ -56,6 +56,18 @@ module Salesforce
       require File.dirname(__FILE__) + '/asf_rest_authenticate.rb'
       include Authenticate
 
+      # Loading the Call Remote module
+      require File.dirname(__FILE__) + '/asf_rest_call_rest_svr.rb'
+      include CallRemote
+
+      # Loading the OrgModel module
+      require File.dirname(__FILE__) + '/asf_rest_org_model.rb'
+      include OrgModel
+      
+      # Loading the CachedCalls module
+      require File.dirname(__FILE__) + '/asf_rest_cached_calls.rb'
+      include CachedCalls
+
       # We are mocking OAuth type authentication. In our case, we use the
       # SessionID obtained from the initial SOAP Web Services call - 'login()'
       # OAuth2 is geared toward website to website authentication.
@@ -80,7 +92,10 @@ module Salesforce
         connection.set_header("Authorization", "OAuth " + @@oauth_token)
 
         # To be used by HTTParty
-        @@auth_header = { "Authorization" => "OAuth " + @@oauth_token, "content-Type" => 'application/json' }
+        @@auth_header = {
+          "Authorization" => "OAuth " + @@oauth_token,
+          "content-Type" => 'application/json'
+        }
         # either application/xml or application/json
         base_uri rest_svr
         self.format = :json
@@ -94,20 +109,19 @@ module Salesforce
       #{"Object Name":{"Name1":"value1","Name2":"value2"}}.
       #The Extra/missing 'Object Name' causes this to break.
       #When this consistency is resolved, this method should be removed.
-      def save
-#        self.class.headers @@auth_header
-#        self.class.base_uri 'https://na7.salesforce.com'
+      # header = {
+      #    "Authorization" => "OAuth " + @@oauth_token,
+      #    "content-Type" => 'application/json'
+      #  }
+      # rest_svr = 'https://na7.salesforce.com'
+      # api_version = 'v21.0' with v prefix
+      def save(header=@@auth_header, rest_svr=@@rest_svr, api_version=@@api_version)
         class_name = self.class.name.gsub(/\S+::/mi, "")
-        path = "/services/data/#{@@api_version}/sobjects/#{class_name}/"
-        target = @@rest_svr + path
+        path = "/services/data/#{api_version}/sobjects/#{class_name}/"
+        target = rest_svr + path
         data = ActiveSupport::JSON::encode(attributes)
-        auth_headers = {
-          'Authorization' => "OAuth "+ @@oauth_token,
-          "content-Type" => 'application/json',
-        }
-        j = ActiveSupport::JSON
 
-        resp = HTTParty.post(target, :body => data, :headers => auth_headers)
+        resp = call_rest_svr("POST", target, header, data)
 
         # HTTP code 201 means it was successfully saved.
         if resp.code != 201
@@ -120,14 +134,11 @@ module Salesforce
 
       #Again the delete feature from ActiveResource does not work out of the box.
       #Using custom delete function
-      def self.delete(id)
+      def self.delete(id, header=@@auth_header, rest_svr=@@rest_svr, api_version=@@api_version)
         class_name = self.name.gsub(/\S+::/mi, "")
-        path = "/services/data/#{@@api_version}/sobjects/#{class_name}/#{id}"
-        target = @@rest_svr + path
-        auth_headers = {
-          'Authorization' => "OAuth "+ @@oauth_token,
-        }
-        resp = HTTParty.delete(target, :headers => auth_headers)
+        path = "/services/data/#{api_version}/sobjects/#{class_name}/#{id}"
+        target = rest_svr + path
+        resp = call_rest_svr("DELETE", target, header)
 
         # HTTP code 204 means it was successfully deleted.
         if resp.code != 204
@@ -145,86 +156,20 @@ module Salesforce
         RESPONSE_HAS_BODY = true
       end
 
-      # Memcached version of the get_detail_info() method
-      def self.xget_detail_info()
-        @@memcache_id =  self.name + "/describe"
-        if Rails.cache.exist? @@memcache_id
-          binobj = Rails.cache.read(@@memcache_id)
-          # deserialize from Json
-          obj = HTTParty::Parser.call(binobj, :json)
-          return obj
-        else
-          obj = self.get_detail_info()
-          # Save a Json, Marshal.dump or :raw does not work
-          Rails.cache.write(@@memcache_id, obj.body)
-          return obj
-        end
-      end
-      #Get detaild info about a single salesforce object
-      def self.get_detail_info()
-        headers @@auth_header
-        class_name = self.name.gsub(/\S+::/mi, "")
-        path = "/services/data/#{@@api_version}/sobjects/#{class_name}/describe"
-        resp = get(path)
-        if (resp.code != 200) || !resp.success?
-          message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
-          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
-        end
-        if (resp.code != 200) || !resp.success?
-          message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
-          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
-        end
-        return resp
-      end
-
-      # Memcached version of the get_meta_data() method
-      def self.xget_meta_data()
-        @@memcache_id =  self.name + "/meta_data"
-        if Rails.cache.exist? @@memcache_id
-          binobj = Rails.cache.read(@@memcache_id)
-          # deserialize from Json
-          obj = HTTParty::Parser.call(binobj, :json)
-          return obj
-        else
-          obj = self.get_meta_data()
-          # Save a Json, Marshal.dump or :raw does not work
-          Rails.cache.write(@@memcache_id, obj.body)
-          return obj
-        end
-      end
-      #get meta data about this object
-      def self.get_meta_data()
-        headers @@auth_header
-        class_name = self.name.gsub(/\S+::/mi, "")
-        path = "/services/data/#{@@api_version}/sobjects/#{class_name}/"
-        resp = get(path)
-        if (resp.code != 200) || !resp.success?
-          message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
-          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
-        end
-        return resp
-      end
-
-      #Update an object
-      def self.update(id, serialized_json)
+      #Update an object # TODO to use the call_rest_svr method
+      def self.update(id, serialized_data_json, header=@@auth_header, rest_svr=@@rest_svr, api_version=@@api_version)
         
         #Again the delete feature from ActiveResource does not work out of the box.
         #Providing a custom update function
-        svr_url_4_http = @@rest_svr.gsub(/https:\/\//mi, "" )  #strip http:// prefix from the url. Otherwise, it will fail.
+        svr_url_4_http = rest_svr.gsub(/https:\/\//mi, "" )  #strip http:// prefix from the url. Otherwise, it will fail.
         http = Net::HTTP.new(svr_url_4_http, @@ssl_port)
-        #http = Net::HTTP.new('https://na7.salesforce.com', @@ssl_port)
         http.use_ssl = true
         class_name = self.name.gsub(/\S+::/mi, "")
-        path = "/services/data/#{@@api_version}/sobjects/#{class_name}/#{id}"
-        headers = {
-          'Authorization' => "OAuth "+ @@oauth_token,
-          "content-Type" => 'application/json',
-        }
-        code = serialized_json
+        path = "/services/data/#{api_version}/sobjects/#{class_name}/#{id}"
+        code = serialized_data_json
         #   format -> Net::HTTPGenericRequest.new(m, reqbody, resbody, path, initheader)
-        req = Net::HTTPGenericRequest.new("PATCH", true, true, path, headers)
+        req = Net::HTTPGenericRequest.new("PATCH", true, true, path, header)
         resp = http.request(req, code) { |response|  }
-
 
         # HTTP code 204 means it was successfully updated. 204 for httparty, '204' for Net::HTTP
         if resp.code != '204'
@@ -235,112 +180,14 @@ module Salesforce
         end
       end
 
-      # Memcached version of the describe_global() method
-      def self.xdescribe_global()
-        @@memcache_id =  self.name + "/describe_global"
-        if Rails.cache.exist? @@memcache_id
-          binobj = Rails.cache.read(@@memcache_id)
-          # deserialize from Json
-          obj = HTTParty::Parser.call(binobj, :json)
-          return obj
-        else
-          obj = self.describe_global()
-          # Save a Json, Marshal.dump or :raw does not work
-          Rails.cache.write(@@memcache_id, obj.body)
-          return obj
-        end
-      end
-      # Describe global of the REST server
-      def self.describe_global()
-        headers @@auth_header
-        path = "/services/data/#{@@api_version}/sobjects/"
-        resp = get(path)
-        if (resp.code != 200) || !resp.success?
-          message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
-          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
-        end
-        return resp
-      end
-
-      # Memcached version of the list_available_resources() method
-      def self.xlist_available_resources()
-        @@memcache_id =  self.name + "/list_resources"
-        if Rails.cache.exist? @@memcache_id
-          binobj = Rails.cache.read(@@memcache_id)
-          # deserialize from Json
-          obj = HTTParty::Parser.call(binobj, :json)
-          return obj
-        else
-          obj = self.list_available_resources()
-          # Save a Json, Marshal.dump or :raw does not work
-          Rails.cache.write(@@memcache_id, obj.body)
-          return obj
-        end
-      end
-      # get resources available on this REST server
-      def self.list_available_resources()
-        headers @@auth_header
-        class_name = self.name.gsub(/\S+::/mi, "")
-        path = "/services/data/#{@@api_version}/"
-        resp = get(path)
-        if (resp.code != 200) || !resp.success?
-          message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
-          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
-        end
-        return resp
-      end
-
-      # Memcached version of the get_version() method
-      def self.xget_version()
-        @@memcache_id =  self.name + "/get_version"
-        if Rails.cache.exist? @@memcache_id
-          binobj = Rails.cache.read(@@memcache_id)
-          # deserialize from Json
-          obj = HTTParty::Parser.call(binobj, :json)
-          return obj
-        else
-          obj = self.get_version()
-          # Save a Json, Marshal.dump or :raw does not work
-          Rails.cache.write(@@memcache_id, obj.body)
-          return obj
-        end
-      end
-      # get version of the REST API Server
-      def self.get_version()
-        headers @@auth_header
-        class_name = self.name.gsub(/\S+::/mi, "")
-        path = '/services/data/'
-        resp = get(path)
-        if (resp.code != 200) || !resp.success?
-          message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
-          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
-        end
-        return resp
-      end
-
-      # Memcached version of the run_soql() method
-      def self.xrun_soql(query)
-        @@memcache_id =  self.name + "/run_soql"
-        if Rails.cache.exist? @@memcache_id
-          binobj = Rails.cache.read(@@memcache_id)
-          # deserialize from Json
-          obj = HTTParty::Parser.call(binobj, :json)
-          return obj
-        else
-          obj = self.run_soql(query)
-          # Save a Json, Marshal.dump or :raw does not work
-          Rails.cache.write(@@memcache_id, obj.body)
-          return obj
-        end
-      end
+      
       # Run SOQL, automatically CGI::escape the query for you.
-      def self.run_soql(query)
-        headers @@auth_header
-        #options = { :query => {:q => query}}
+      def self.run_soql(query, header=@@auth_header, rest_svr=@@rest_svr, api_version=@@api_version)
         class_name = self.name.gsub(/\S+::/mi, "")
         safe_query = CGI::escape(query)
-        path = "/services/data/#{@@api_version}/query?q=#{safe_query}"
-        resp = get(path)
+        path = "/services/data/#{api_version}/query?q=#{safe_query}"
+        target = rest_svr+path
+        resp = call_rest_svr("GET", target, header)
         #resp = get(path, options)
         if (resp.code != 200) || !resp.success?
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
@@ -351,18 +198,16 @@ module Salesforce
 
       # Run SOQL, automatically CGI::escape the query for you.
       # This is with given credentials -> query, security_token, rest_svr, version
+      # the path with appropriate api_version, CGI escaping the query string is
+      # included in this method.
       def self.run_soql_with_credential(query, security_token, rest_svr, api_version)
-        #set base url of the rest server
-        base_uri rest_svr
-        #set the oauth token
-        auth_setting = { "Authorization" => "OAuth " + security_token, "content-Type" => 'application/json' }
-        Salesforce::Rest::AsfRest.set_headers(auth_setting)
+        header = { "Authorization" => "OAuth " + security_token, "content-Type" => 'application/json' }
         #set the path with appropriate api_version, include CGI escaping the query string
         safe_query = CGI::escape(query)
         path = "/services/data/#{api_version}/query?q=#{safe_query}"
-
+        target = rest_svr + path
         #get the result
-        resp = get(path)
+        resp = call_rest_svr("GET", target, header)
         if (resp.code != 200) || !resp.success?
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
           Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
@@ -370,27 +215,14 @@ module Salesforce
         return resp
       end
 
-      # Memcached version of the run_sosl() method
-      def self.xrun_sosl(search)
-        @@memcache_id =  self.name + "/run_sosl"
-        if Rails.cache.exist? @@memcache_id
-          binobj = Rails.cache.read(@@memcache_id)
-          # deserialize from Json
-          obj = HTTParty::Parser.call(binobj, :json)
-          return obj
-        else
-          obj = self.run_sosl(search)
-          # Save a Json, Marshal.dump or :raw does not work
-          Rails.cache.write(@@memcache_id, obj.body)
-          return obj
-        end
-      end
+
       # Run SOSL, do not use CGI::escape -> SF will complain about missing {braces}
-      def self.run_sosl(search)
-        headers @@auth_header
+      def self.run_sosl(search, header=@@auth_header, rest_svr=@@rest_svr, api_version=@@api_version)
         options = { :query => {:q => search}}
         class_name = self.name.gsub(/\S+::/mi, "")
-        path = URI.escape("/services/data/#{@@api_version}/search/?q=#{search}")
+        path = URI.escape("/services/data/#{api_version}/search/?q=#{search}")
+        target = rest_svr + path
+        #resp = call_rest_svr("GET", target, header) # TODO change to call_rest_svr
         resp = get(path, options)
         if (resp.code != 200) || !resp.success?
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
@@ -402,38 +234,18 @@ module Salesforce
       # Run SOSL, do not use CGI::escape -> SF will complain about missing {braces}
       # This is with given credentials -> Search_query, security_token, rest_svr, version
       def self.run_sosl_with_credential(search, security_token, rest_svr, api_version)
-        #set base url of the rest server
-        base_uri rest_svr
-        #set the oauth token
-        auth_setting = { "Authorization" => "OAuth " + security_token, "content-Type" => 'application/json' }
-        Salesforce::Rest::AsfRest.set_headers(auth_setting)
-
+        header = { "Authorization" => "OAuth " + security_token, "content-Type" => 'application/json' }
         #set the path with appropriate api_version, with the search string
         path = URI.escape("/services/data/#{api_version}/search/?q=#{search}")
-
+        target = rest_svr + path        
         #get the result
+        resp = call_rest_svr("GET", target, header)
         resp = get(path)
         if (resp.code != 200) || !resp.success?
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
           Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
         end
         return resp
-      end
-
-      # xfind is the cached version of the ActiveReources Find method. You will
-      # see the speed improvement with memcache turned on.
-      def self.xfind(*arguments)
-        if Rails.cache.exist? arguments
-          binobj = Rails.cache.read(arguments)
-          # deserialize from Json
-          obj = self.name.constantize.new.from_json(binobj)
-          return obj
-        else
-          obj = self.find(arguments)
-          # Save a Json, Marshal.dump or :raw does not work
-          Rails.cache.write(arguments, obj.to_json())
-          return obj
-        end
       end
 
       # Used for removing the .xml and .json extensions at the end of the URL link.
