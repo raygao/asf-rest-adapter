@@ -24,7 +24,7 @@ module CachedCalls
 
       # xfind is the cached version of the ActiveReources Find method. You will
       # see the speed improvement with memcache turned on.
-      def self.xfind(*arguments)
+      def xfind(*arguments)
         if Rails.cache.exist? arguments
           binobj = Rails.cache.read(arguments)
           # deserialize from Json
@@ -39,7 +39,7 @@ module CachedCalls
       end
 
       # Memcached version of the describe_global() method
-      def self.xdescribe_global()
+      def xdescribe_global()
         @@memcache_id =  self.name + "/describe_global"
         if Rails.cache.exist? @@memcache_id
           binobj = Rails.cache.read(@@memcache_id)
@@ -55,7 +55,7 @@ module CachedCalls
       end
 
       # Memcached version of the get_detail_info() method
-      def self.xget_detail_info()
+      def xget_detail_info()
         @@memcache_id =  self.name + "/describe"
         if Rails.cache.exist? @@memcache_id
           binobj = Rails.cache.read(@@memcache_id)
@@ -71,7 +71,7 @@ module CachedCalls
       end
 
       # Memcached version of the get_meta_data() method
-      def self.xget_meta_data()
+      def xget_meta_data()
         @@memcache_id =  self.name + "/meta_data"
         if Rails.cache.exist? @@memcache_id
           binobj = Rails.cache.read(@@memcache_id)
@@ -87,7 +87,7 @@ module CachedCalls
       end
 
       # Memcached version of the list_available_resources() method
-      def self.xlist_available_resources()
+      def xlist_available_resources()
         @@memcache_id =  self.name + "/list_resources"
         if Rails.cache.exist? @@memcache_id
           binobj = Rails.cache.read(@@memcache_id)
@@ -103,7 +103,7 @@ module CachedCalls
       end
 
       # Memcached version of the get_version() method
-      def self.xget_version()
+      def xget_version()
         @@memcache_id =  self.name + "/get_version"
         if Rails.cache.exist? @@memcache_id
           binobj = Rails.cache.read(@@memcache_id)
@@ -119,7 +119,7 @@ module CachedCalls
       end
 
       # Memcached version of the run_soql() method
-      def self.xrun_soql(query)
+      def xrun_soql(query)
         @@memcache_id =  self.name + "/run_soql"
         if Rails.cache.exist? @@memcache_id
           binobj = Rails.cache.read(@@memcache_id)
@@ -135,7 +135,7 @@ module CachedCalls
       end
 
       # Memcached version of the run_sosl() method
-      def self.xrun_sosl(search)
+      def xrun_sosl(search)
         @@memcache_id =  self.name + "/run_sosl"
         if Rails.cache.exist? @@memcache_id
           binobj = Rails.cache.read(@@memcache_id)

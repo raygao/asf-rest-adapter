@@ -75,9 +75,9 @@ module Salesforce
       # Force.com database. Therefore, we use security id.
       # example:
       # connection.set_header("Authorization",  'OAuth 00DA0000000XwIQ!AQIAQD_BX.pdxMz0YBKdkz45PijY0gMxH65JwvV6Yj4.hf44WJYqO9ug7DfhNbnxuO9buhbftiX9Qv5DyBLHauaJhqTh79vi')
-
+      #
       # self.abstract_class = true
-
+      #
       # Setup the adapter
       def self.setup(oauth_token, rest_svr, api_version)
         @@oauth_token = oauth_token
@@ -115,7 +115,9 @@ module Salesforce
       #  }
       # rest_svr = 'https://na7.salesforce.com'
       # api_version = 'v21.0' with v prefix
-      def save(header=@@auth_header, rest_svr=@@rest_svr, api_version=@@api_version)
+      def save(header=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@auth_header"),
+          rest_svr=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@rest_svr"),
+          api_version=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@api_version"))
         class_name = self.class.name.gsub(/\S+::/mi, "")
         path = "/services/data/#{api_version}/sobjects/#{class_name}/"
         target = rest_svr + path
@@ -134,7 +136,9 @@ module Salesforce
 
       #Again the delete feature from ActiveResource does not work out of the box.
       #Using custom delete function
-      def self.delete(id, header=@@auth_header, rest_svr=@@rest_svr, api_version=@@api_version)
+      def self.delete(id, header=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@auth_header"),
+          rest_svr=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@rest_svr"),
+          api_version=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@api_version"))
         class_name = self.name.gsub(/\S+::/mi, "")
         path = "/services/data/#{api_version}/sobjects/#{class_name}/#{id}"
         target = rest_svr + path
@@ -157,7 +161,9 @@ module Salesforce
       end
 
       #Update an object # TODO to use the call_rest_svr method
-      def self.update(id, serialized_data_json, header=@@auth_header, rest_svr=@@rest_svr, api_version=@@api_version)
+      def self.update(id, serialized_data_json, header=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@auth_header"),
+          rest_svr=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@rest_svr"),
+          api_version=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@api_version"))
         
         #Again the delete feature from ActiveResource does not work out of the box.
         #Providing a custom update function
@@ -179,10 +185,11 @@ module Salesforce
           return resp
         end
       end
-
       
       # Run SOQL, automatically CGI::escape the query for you.
-      def self.run_soql(query, header=@@auth_header, rest_svr=@@rest_svr, api_version=@@api_version)
+      def self.run_soql(query, header=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@auth_header"),
+          rest_svr=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@rest_svr"),
+          api_version=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@api_version"))
         class_name = self.name.gsub(/\S+::/mi, "")
         safe_query = CGI::escape(query)
         path = "/services/data/#{api_version}/query?q=#{safe_query}"
@@ -217,7 +224,9 @@ module Salesforce
 
 
       # Run SOSL, do not use CGI::escape -> SF will complain about missing {braces}
-      def self.run_sosl(search, header=@@auth_header, rest_svr=@@rest_svr, api_version=@@api_version)
+      def self.run_sosl(search, header=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@auth_header"),
+          rest_svr=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@rest_svr"),
+          api_version=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@api_version"))
         options = { :query => {:q => search}}
         class_name = self.name.gsub(/\S+::/mi, "")
         path = URI.escape("/services/data/#{api_version}/search/?q=#{search}")

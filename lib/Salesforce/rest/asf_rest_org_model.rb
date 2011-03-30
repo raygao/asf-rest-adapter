@@ -22,7 +22,9 @@ module OrgModel
   def self.included(base)
     class << base
       # Get all available SObjects & their meta-data for an organization
-      def self.describe_global(header=@@auth_header, rest_svr=@@rest_svr, api_version=@@api_version)
+      def describe_global(header=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@auth_header"),
+          rest_svr=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@rest_svr"),
+          api_version=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@api_version"))
         path = "/services/data/#{api_version}/sobjects/"
         target = rest_svr + path
         resp = call_rest_svr("GET", target, header, nil)
@@ -35,7 +37,9 @@ module OrgModel
       end
 
       # get available versions for making REST API calls
-      def self.get_version(header=@@auth_header, rest_svr=@@rest_svr, api_version=@@api_version)
+      def get_version(header=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@auth_header"),
+          rest_svr=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@rest_svr"),
+          api_version=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@api_version"))
         path = '/services/data/'
         target = rest_svr + path
         resp = call_rest_svr("GET", target, header, nil)
@@ -47,7 +51,9 @@ module OrgModel
       end
 
       # get resources available for REST, e.g. Query, Search, SObjects, Recent
-      def self.list_available_resources(header=@@auth_header, rest_svr=@@rest_svr, api_version=@@api_version)       
+      def list_available_resources(header=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@auth_header"),
+          rest_svr=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@rest_svr"),
+          api_version=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@api_version"))
         path = "/services/data/#{api_version}/"
         target = rest_svr + path
         resp = call_rest_svr("GET", target, header, nil)
@@ -59,7 +65,9 @@ module OrgModel
       end
 
       #Get detailed info about a single Salesforce SObject, e.g. Name, fields, edit template, etc.
-      def self.get_detail_info(header=@@auth_header, rest_svr=@@rest_svr, api_version=@@api_version)
+      def get_detail_info(header=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@auth_header"),
+          rest_svr=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@rest_svr"),
+          api_version=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@api_version"))
         class_name = self.name.gsub(/\S+::/mi, "")
         path = "/services/data/#{api_version}/sobjects/#{class_name}/describe"
         target = rest_svr + path        
@@ -76,7 +84,9 @@ module OrgModel
       end
 
       #get meta data about an SObject, including rows of recent items
-      def self.get_meta_data(header=@@auth_header, rest_svr=@@rest_svr, api_version=@@api_version)
+      def get_meta_data(header=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@auth_header"),
+          rest_svr=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@rest_svr"),
+          api_version=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@api_version"))
         class_name = self.name.gsub(/\S+::/mi, "")
         path = "/services/data/#{api_version}/sobjects/#{class_name}/"
         target = rest_svr + path
