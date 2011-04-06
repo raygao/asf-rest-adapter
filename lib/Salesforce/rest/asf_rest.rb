@@ -42,7 +42,7 @@ module Salesforce
       # default REST API server for HTTParty
       base_uri "https://na7.salesforce.com"
       default_params :output => 'json'
-      self.format = :json
+      format :json
 
       #ActiveResource setting
       self.site = "https://na7.salesforce.com/services/data/v21.0/sobjects"
