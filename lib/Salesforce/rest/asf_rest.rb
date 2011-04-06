@@ -42,7 +42,7 @@ module Salesforce
       # default REST API server for HTTParty
       base_uri "https://na7.salesforce.com"
       default_params :output => 'json'
-      format :json
+      self.format = :json
 
       #ActiveResource setting
       self.site = "https://na7.salesforce.com/services/data/v21.0/sobjects"
@@ -63,7 +63,7 @@ module Salesforce
       # Loading the OrgModel module
       require File.dirname(__FILE__) + '/asf_rest_org_model.rb'
       include OrgModel
-      
+
       # Loading the CachedCalls module
       require File.dirname(__FILE__) + '/asf_rest_cached_calls.rb'
       include CachedCalls
@@ -164,7 +164,7 @@ module Salesforce
       def self.update(id, serialized_data_json, header=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@auth_header"),
           rest_svr=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@rest_svr"),
           api_version=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@api_version"))
-        
+
         #Again the delete feature from ActiveResource does not work out of the box.
         #Providing a custom update function
         svr_url_4_http = rest_svr.gsub(/https:\/\//mi, "" )  #strip http:// prefix from the url. Otherwise, it will fail.
@@ -185,7 +185,7 @@ module Salesforce
           return resp
         end
       end
-      
+
       # Run SOQL, automatically CGI::escape the query for you.
       def self.run_soql(query, header=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@auth_header"),
           rest_svr=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@rest_svr"),
@@ -246,7 +246,7 @@ module Salesforce
         header = { "Authorization" => "OAuth " + security_token, "content-Type" => 'application/json' }
         #set the path with appropriate api_version, with the search string
         path = URI.escape("/services/data/#{api_version}/search/?q=#{search}")
-        target = rest_svr + path        
+        target = rest_svr + path
         #get the result
         resp = call_rest_svr("GET", target, header)
         resp = get(path)
