@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{asf-rest-adapter}
-  s.version = "0.3.0"
+  s.version = "0.3.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Raymond Gao @ Are4Us Technologies"]
-  s.date = %q{2011-03-29}
+  s.date = %q{2011-03-30}
   s.description = %q{REST based adapter for Salesforce}
   s.email = %q{raygao2000@yahoo.com}
   s.extra_rdoc_files = [
@@ -37,7 +37,10 @@ Gem::Specification.new do |s|
     "lib/Salesforce/rest/asf_connection.rb",
     "lib/Salesforce/rest/asf_rest.rb",
     "lib/Salesforce/rest/asf_rest_authenticate.rb",
+    "lib/Salesforce/rest/asf_rest_cached_calls.rb",
+    "lib/Salesforce/rest/asf_rest_call_rest_svr.rb",
     "lib/Salesforce/rest/asf_rest_error.rb",
+    "lib/Salesforce/rest/asf_rest_org_model.rb",
     "lib/Salesforce/rest/classes/account.rb",
     "lib/Salesforce/rest/classes/account_feed.rb",
     "lib/Salesforce/rest/classes/apex_log.rb",
