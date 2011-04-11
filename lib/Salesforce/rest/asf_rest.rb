@@ -231,8 +231,7 @@ module Salesforce
         class_name = self.name.gsub(/\S+::/mi, "")
         path = URI.escape("/services/data/#{api_version}/search/?q=#{search}")
         target = rest_svr + path
-        #resp = call_rest_svr("GET", target, header) # TODO change to call_rest_svr
-        resp = get(path, options)
+        resp = call_rest_svr("GET", target, header)
         if (resp.code != 200) || !resp.success?
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
           Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
