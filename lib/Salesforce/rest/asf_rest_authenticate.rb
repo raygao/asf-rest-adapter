@@ -56,7 +56,7 @@ module Authenticate
       # Ignite the adapter, using the config_file, This will in term invoke
       # bootup_rest_adapter(username, password, api_version) or set up with
       # consumer key/secret with omniauth
-      def self.ignite_adapter(config_file)
+      def ignite_adapter(config_file)
         #Read the configuration file
 
         begin
