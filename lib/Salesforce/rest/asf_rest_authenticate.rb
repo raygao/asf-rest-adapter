@@ -60,7 +60,7 @@ module Authenticate
         #Read the configuration file
 
         begin
-          asf_rest_config = YAML::load(config_file)
+          asf_rest_config = YAML::load(File.open(config_file))
 
           auth_scheme =  asf_rest_config["asf-rest-config"] ["auth_scheme"]
           puts "ASF-REST-Adapter setting:"
