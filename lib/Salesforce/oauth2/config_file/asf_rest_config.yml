@@ -1,0 +1,12 @@
+asf-rest-config:
+  # Either "username_password" or "omni_auth"
+  auth_scheme: <username_password> or <omni_auth>
+  #username_password
+  adapter: activesalesforce
+  url: https://login.salesforce.com
+  username: <e-mail address>
+  password: <password + security_token>
+  api_version: 21.0
+  #omni_auth
+  consumer_key: <your consumer key>
+  consumer_secret: <your consumer secret>

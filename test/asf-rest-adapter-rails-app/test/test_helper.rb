@@ -16,10 +16,7 @@ class ActiveSupport::TestCase
 
 
   def setup
-#    initalize_adapter()
-#    either use the classic ASF-SOAP-ADAPTER dependency
-    #Salesforce::Rest::AsfRest.bootup_rest_adapter_with_old_adapter()
-#   Or, use RFORCE to create a session directly.
+#   use RFORCE to create a session directly or use consumer secret/key with omniauth
 
     username = 'your SF usermame'
     password = 'SF password + token'

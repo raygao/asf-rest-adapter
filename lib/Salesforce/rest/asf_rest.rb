@@ -17,6 +17,7 @@ require 'net/https'
 require 'net/http'
 require 'active_resource'
 require 'httparty'
+require 'rforce'
 
 
 module Salesforce

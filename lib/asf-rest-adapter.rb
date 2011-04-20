@@ -56,3 +56,6 @@ require File.dirname(__FILE__) + '/Salesforce/rest/classes/user.rb'
 require File.dirname(__FILE__) + '/Salesforce/rest/classes/user_feed.rb'
 require File.dirname(__FILE__) + '/Salesforce/rest/classes/user_role.rb'
 require File.dirname(__FILE__) + '/Salesforce/rest/classes/user_profile_feed.rb'
+
+# OmniAuth/Salesforce Library
+require File.dirname(__FILE__) + '/Salesforce/oauth2/forcedotcom.rb'
