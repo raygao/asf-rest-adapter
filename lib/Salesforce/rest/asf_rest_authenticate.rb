@@ -72,10 +72,10 @@ module Authenticate
               puts 'Setting up adapter using username/password'
             username = asf_rest_config["asf-rest-config"]["username"]
             password = asf_rest_config["asf-rest-config"]["password"]
-            login_svr = asf_rest_config["asf-rest-config"]["api_version"].to_s
+            login_svr = asf_rest_config["asf-rest-config"]["url"].to_s
             api_version = asf_rest_config["asf-rest-config"]["api_version"].to_s
 
-            puts "Salesforce url: " + asf_rest_config["asf-rest-config"]["url"]
+            puts "Salesforce url: " + asf_rest_config["asf-rest-config"]["url"].to_s
             puts "Username: " + username
             puts "Password: " + password
             puts "API Version " + login_svr
