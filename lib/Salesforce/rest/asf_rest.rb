@@ -154,6 +154,26 @@ module Salesforce
         end
       end
 
+      #Again the find feature from ActiveResource does not support multi-user access
+      #Using custom Find function
+      def self.find(id, header=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@auth_header"),
+          rest_svr=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@rest_svr"),
+          api_version=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@api_version"))
+        class_name = self.name.gsub(/\S+::/mi, "")
+        path = "/services/data/#{api_version}/sobjects/#{class_name}/#{id}"
+        target = rest_svr + path
+        resp = Salesforce::Rest::AsfRest::call_rest_svr("GET", target, header)
+
+        # HTTP code 204 means it was successfully deleted.
+        if resp.code != 200
+          message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
+          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
+        else
+          return resp
+        end
+      end
+
+
       #Custom object with PATCH method
       class TrackRequest < Net::HTTPRequest
         METHOD = 'PATCH'
