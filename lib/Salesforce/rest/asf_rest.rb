@@ -129,7 +129,7 @@ module Salesforce
         # HTTP code 201 means it was successfully saved.
         if resp.code != 201
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
-          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
+          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code)
         else
           return resp
         end
@@ -148,7 +148,7 @@ module Salesforce
         # HTTP code 204 means it was successfully deleted.
         if resp.code != 204
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
-          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
+          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code)
         else
           return resp
         end
@@ -167,7 +167,7 @@ module Salesforce
         # HTTP code 204 means it was successfully deleted.
         if resp.code != 200
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
-          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
+          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code)
         else
           return resp
         end
@@ -201,7 +201,7 @@ module Salesforce
         # HTTP code 204 means it was successfully updated. 204 for httparty, '204' for Net::HTTP
         if resp.code != '204'
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
-          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
+          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code)
         else
           return resp
         end
@@ -219,7 +219,7 @@ module Salesforce
         #resp = get(path, options)
         if (resp.code != 200) || !resp.success?
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
-          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
+          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code)
         end
         return resp
       end
@@ -238,7 +238,7 @@ module Salesforce
         resp = Salesforce::Rest::AsfRest::call_rest_svr("GET", target, header)
         if (resp.code != 200) || !resp.success?
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
-          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
+          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code)
         end
         return resp
       end
@@ -255,7 +255,7 @@ module Salesforce
         resp = Salesforce::Rest::AsfRest::call_rest_svr("GET", target, header)
         if (resp.code != 200) || !resp.success?
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
-          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
+          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code)
         end
         return resp
       end
@@ -271,7 +271,7 @@ module Salesforce
         resp = Salesforce::Rest::AsfRest::call_rest_svr("GET", target, header)
         if (resp.code != 200) || !resp.success?
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
-          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
+          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code)
         end
         return resp
       end
