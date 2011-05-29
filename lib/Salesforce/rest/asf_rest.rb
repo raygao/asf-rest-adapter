@@ -124,7 +124,7 @@ module Salesforce
         target = rest_svr + path
         data = ActiveSupport::JSON::encode(attributes)
 
-        resp = call_rest_svr("POST", target, header, data)
+        resp = Salesforce::Rest::AsfRest::call_rest_svr("POST", target, header, data)
 
         # HTTP code 201 means it was successfully saved.
         if resp.code != 201
@@ -143,7 +143,7 @@ module Salesforce
         class_name = self.name.gsub(/\S+::/mi, "")
         path = "/services/data/#{api_version}/sobjects/#{class_name}/#{id}"
         target = rest_svr + path
-        resp = call_rest_svr("DELETE", target, header)
+        resp = Salesforce::Rest::AsfRest::call_rest_svr("DELETE", target, header)
 
         # HTTP code 204 means it was successfully deleted.
         if resp.code != 204
@@ -195,7 +195,7 @@ module Salesforce
         safe_query = CGI::escape(query)
         path = "/services/data/#{api_version}/query?q=#{safe_query}"
         target = rest_svr+path
-        resp = call_rest_svr("GET", target, header)
+        resp = Salesforce::Rest::AsfRest::call_rest_svr("GET", target, header)
         #resp = get(path, options)
         if (resp.code != 200) || !resp.success?
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
@@ -215,7 +215,7 @@ module Salesforce
         path = "/services/data/#{api_version}/query?q=#{safe_query}"
         target = rest_svr + path
         #get the result
-        resp = call_rest_svr("GET", target, header)
+        resp = Salesforce::Rest::AsfRest::call_rest_svr("GET", target, header)
         if (resp.code != 200) || !resp.success?
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
           Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
@@ -232,7 +232,7 @@ module Salesforce
         class_name = self.name.gsub(/\S+::/mi, "")
         path = URI.escape("/services/data/#{api_version}/search/?q=#{search}")
         target = rest_svr + path
-        resp = call_rest_svr("GET", target, header)
+        resp = Salesforce::Rest::AsfRest::call_rest_svr("GET", target, header)
         if (resp.code != 200) || !resp.success?
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
           Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)
@@ -248,7 +248,7 @@ module Salesforce
         path = URI.escape("/services/data/#{api_version}/search/?q=#{search}")
         target = rest_svr + path
         #get the result
-        resp = call_rest_svr("GET", target, header)
+        resp = Salesforce::Rest::AsfRest::call_rest_svr("GET", target, header)
         if (resp.code != 200) || !resp.success?
           message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
           Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code.to_s)

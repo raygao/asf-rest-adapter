@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{asf-rest-adapter}
-  s.version = "0.4.3"
+  s.version = "0.4.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Raymond Gao @ Are4Us Technologies"]
-  s.date = %q{2011-05-05}
+  s.date = %q{2011-05-23}
   s.description = %q{REST based adapter for Salesforce}
   s.email = %q{raygao2000@yahoo.com}
   s.extra_rdoc_files = [
@@ -26,6 +26,8 @@ Gem::Specification.new do |s|
     "Rakefile",
     "VERSION",
     "asf-rest-adapter.gemspec",
+    "lib/.DS_Store",
+    "lib/Salesforce/.DS_Store",
     "lib/Salesforce/oauth2/config_file/asf_rest_config.yml",
     "lib/Salesforce/oauth2/enviornments/environment.rb",
     "lib/Salesforce/oauth2/forcedotcom.rb",
