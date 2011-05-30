@@ -44,6 +44,7 @@ module Salesforce
       base_uri "https://na7.salesforce.com"
       default_params :output => 'json'
       format :json
+      @@ssl_port = 443  
 
       #ActiveResource setting
       self.site = "https://na7.salesforce.com/services/data/v21.0/sobjects"

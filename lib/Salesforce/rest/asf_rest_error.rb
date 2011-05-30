@@ -45,7 +45,7 @@ module Salesforce
         when 415
           raise Salesforce::Rest::AsfEntityError.new(message, http_code)
         when 500
-          raise Salesforce::Rest::AsfPlatformrror.new(message, http_code)
+          raise Salesforce::Rest::AsfPlatformError.new(message, http_code)
         else
           raise Salesforce::Rest::AsfRuntimeError.new(message, http_code)
         end
