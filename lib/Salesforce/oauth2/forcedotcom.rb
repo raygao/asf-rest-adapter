@@ -24,7 +24,31 @@ module OmniAuth
         OmniAuth::Utils.deep_merge(super, {
             'uid' => @access_token['id'],
             'credentials' => {
-              'instance_url' => @access_token['instance_url']
+              'instance_url' => @access_token['instance_url'],
+              'credentials' => {"refresh_token" => @access_token.refresh_token,
+                                "consumer_key" => @access_token.client.id,
+                                "consumer_secret" => @access_token.client.secret
+              }
+            },
+            'extra' => {'user_hash' => data},
+            'user_info' => {
+              'email' => data['email'],
+              'name' => data['display_name']
+            }
+          })
+      end
+
+
+      def auth_hash
+        data = user_data
+        OmniAuth::Utils.deep_merge(super, {
+            'uid' => @access_token['id'],
+            'credentials' => {
+              "instance_url" => @access_token['instance_url'],
+              "refresh_token" => @access_token.refresh_token,
+              "consumer_key" => @access_token.client.id,
+              "consumer_secret" => @access_token.client.secret
+
             },
             'extra' => {'user_hash' => data},
             'user_info' => {

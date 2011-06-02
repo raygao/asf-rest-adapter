@@ -190,6 +190,9 @@ module Salesforce
         #Again the delete feature from ActiveResource does not work out of the box.
         #Providing a custom update function
         svr_url_4_http = rest_svr.gsub(/https:\/\//mi, "" )  #strip http:// prefix from the url. Otherwise, it will fail.
+        if @@ssl_port.nil?
+          @@ssl_port = 443
+        end
         http = Net::HTTP.new(svr_url_4_http, @@ssl_port)
         http.use_ssl = true
         class_name = self.name.gsub(/\S+::/mi, "")
