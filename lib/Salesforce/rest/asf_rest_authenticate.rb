@@ -68,7 +68,7 @@ module Authenticate
 
           #setup the default adapter with relevant auth schema (username/password) or (Omniauth)
           case auth_scheme
-          when "username_password":
+          when "username_password" then
               puts 'Setting up adapter using username/password'
             username = asf_rest_config["asf-rest-config"]["username"]
             password = asf_rest_config["asf-rest-config"]["password"]
@@ -84,7 +84,7 @@ module Authenticate
             puts 'Security Token: ' + security_token
             puts 'rest_svr: ' + rest_svr
             puts 'rest_version: ' + rest_version
-          when"omni_auth":
+          when"omni_auth" then
               consumer_key = asf_rest_config["asf-rest-config"]["consumer_key"]
             consumer_secret = asf_rest_config["asf-rest-config"]["consumer_secret"]
 
