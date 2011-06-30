@@ -18,7 +18,7 @@ class Salesforce::Rest::RestCreateDeleteTest < ActiveSupport::TestCase
   resp = new_acct.save()
     # See http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
     # HTTP Code 201 is created successfully.
-    assert (resp.code == "201")
+    assert (resp.code == 201)
     j = ActiveSupport::JSON
     @sf_oid = j.decode(resp.body)["id"]      
     puts "New Object created: id -> "  + @sf_oid    

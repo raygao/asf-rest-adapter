@@ -78,10 +78,6 @@ module Salesforce
         @@rest_svr_url = rest_svr + "/services/data/#{api_version}/sobjects"
         @@ssl_port = 443  # TODO, right SF use port 443 for all HTTPS traffic.
 
-        #ActiveResource setting
-        #connection.set_header("Authorization", "OAuth " + @@oauth_token)
-        #self.format = :json
-
         # To be used by HTTParty
         @@auth_header = {
           "Authorization" => "OAuth " + @@oauth_token,

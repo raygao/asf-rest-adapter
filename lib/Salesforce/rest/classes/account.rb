@@ -21,10 +21,6 @@ module Salesforce
     # For complete list of Salesforce Standard Objects in V20.
     class Account < AsfRest
       set_collection_name "Account"
-
-      schema do
-        string "BillingStreet", "BillingState", "Name", "OwnerId", "LastModifiedDate", "CreatedDate", "Phone", "ShippingCity", "Id", "BillingCountry", "IsDeleted", "BillingCity", "CreatedById", "SystemModstamp", "MasterRecordId", "Fax", "ShippingState", "Website", "ShippingCountry", "Description", "LastModifiedById", "ShippingPostalCode", "NumberOfEmployees", "AnnualRevenue", "ParentId", "BillingPostalCode", "Type", "Industry", "LastActivityDate", "ShippingStreet"
-       end
     end
   end
 end

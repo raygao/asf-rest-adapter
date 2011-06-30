@@ -20,11 +20,11 @@ class Salesforce::Rest::RestFindTest < ActiveSupport::TestCase
     assert !rest_user.empty?
     puts "#" * 80
 
-    rest_user.attributes.each do |user_attr|
-      unless user_attr[1].nil?
-        pp user_attr[0] + ":   " + user_attr[1].to_s
+    rest_user.keys.each do |key|
+      unless key.nil?
+        pp key + ":   " + rest_user[key].to_s
       else
-        pp user_attr[0] + ":   "
+        pp key + ":   "
       end
     end
   end
@@ -33,7 +33,7 @@ class Salesforce::Rest::RestFindTest < ActiveSupport::TestCase
   def test_run_sosl
     puts "## run sosl ##"
     search = "FIND+{test}"
-    resp = Salesforce::Rest::AsfRest.xrun_sosl(search)
+    resp = Salesforce::Rest::AsfRest.run_sosl(search)
 
     counter = 0
     while counter < resp.size
@@ -68,7 +68,7 @@ class Salesforce::Rest::RestFindTest < ActiveSupport::TestCase
   #Describe Global
   def test_describe_global
     puts "## describe global ##"
-    resp = Salesforce::Rest::AsfRest.xdescribe_global()
+    resp = Salesforce::Rest::AsfRest.describe_global()
 
     pp resp
     #puts "***now:*** data =>   " + resp.body
@@ -76,7 +76,7 @@ class Salesforce::Rest::RestFindTest < ActiveSupport::TestCase
   end
 
 
-  # Get detailed info about an object
+  # Get detailed info about an object, e.g. Name, fields, edit template, etc.
   def test_get_detail_info
     puts "## get detail info about an object##"
     resp = Salesforce::Rest::Account.xget_detail_info()
@@ -95,7 +95,7 @@ class Salesforce::Rest::RestFindTest < ActiveSupport::TestCase
     assert !resp.nil?
   end
 
-  # Get Resources available on this REST server
+  # Get Resources available on this REST server 
   def test_list_available_resources
     puts "## list_available_resources (retrieveable SF objects) ##"
     resp = Salesforce::Rest::AsfRest.xlist_available_resources()

@@ -17,10 +17,11 @@ class Salesforce::Rest::UserTest < ActiveSupport::TestCase
   def test_find_a_single_item
     #rest_acct = Salesforce::Rest::Account.find("001A0000009ajW7IAI")
     puts "-- find an single object with SF OID --"
-    rest_user = Salesforce::Rest::User.xfind("005A0000000S2C7IAK")
+    rest_user = Salesforce::Rest::User.find("005A0000000S2C7IAK")
     assert !rest_user.empty?
     puts "#" * 80
-
+=begin
+  # No longer valid, because ActiveResource has been removed.
     rest_user.attributes.each do |user_attr|
       unless user_attr[1].nil?
         puts user_attr[0] + ":   " + user_attr[1].to_s
@@ -28,6 +29,14 @@ class Salesforce::Rest::UserTest < ActiveSupport::TestCase
         puts user_attr[0] + ":   "
       end
     end
+=end
+    rest_user.keys.each do |key|
+      unless key.nil?
+        pp key + ":   " + rest_user[key].to_s
+      else
+        pp key + ":   "
+      end
+    end
   end
-
+  
 end

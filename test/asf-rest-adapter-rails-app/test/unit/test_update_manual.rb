@@ -41,7 +41,7 @@ class Salesforce::Rest::RestCreateDeleteTest < ActiveSupport::TestCase
     #http = Net::HTTP.new(@rest_svr_url, 443)
     http = Net::HTTP.new('na7.salesforce.com', 443)
     http.use_ssl = true
-
+    
     class_name = "Account"
     path = "/services/data/v21.0/sobjects/#{class_name}/#{@sf_oid}"
     headers = {
@@ -50,7 +50,7 @@ class Salesforce::Rest::RestCreateDeleteTest < ActiveSupport::TestCase
     }
     code = serialized_json
 
-
+    
     req = Net::HTTPGenericRequest.new("PATCH", true, true, path, headers)
 
     resp = http.request(req, code) { |response|  }

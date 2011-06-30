@@ -20,14 +20,14 @@ class Salesforce::Rest::RestCreateDeleteTest < ActiveSupport::TestCase
       # HTTP Code 201 is created successfully.
       assert (resp.code == 201)
       j = ActiveSupport::JSON
-      @sf_oid = j.decode(resp.body)["id"]
+      @sf_oid = j.decode(resp.body)["id"]      
       puts "New Object created: id -> "  + @sf_oid
 
       puts "--delete that newly created account--"
       del_result = Salesforce::Rest::Account.delete(@sf_oid)
       assert (del_result.code == 204)
       puts "Delete Operation HTTP response code: " + del_result.code.to_s
-
+      
     end
 
   end
