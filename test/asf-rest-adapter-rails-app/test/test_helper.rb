@@ -29,6 +29,7 @@ class ActiveSupport::TestCase
     search = "FIND+{test}"
 
     security_token, rest_svr, rest_version = Salesforce::Rest::AsfRest.bootup_rest_adapter(username, password, api_version)
+    security_token, rest_svr, rest_version = Salesforce::Rest::AsfApexRest.bootup_rest_adapter(username, password, api_version)
 
   end
 

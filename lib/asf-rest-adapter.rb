@@ -17,6 +17,7 @@
 require File.dirname(__FILE__) + '/Salesforce/rest/asf_rest_error.rb'
 require File.dirname(__FILE__) + '/Salesforce/rest/asf_connection.rb'
 require File.dirname(__FILE__) + '/Salesforce/rest/asf_rest.rb'
+require File.dirname(__FILE__) + '/Salesforce/rest/asf_apex_rest.rb'
 
 #Now common objects
 require File.dirname(__FILE__) + '/Salesforce/rest/classes/apex_log.rb'
@@ -59,3 +60,6 @@ require File.dirname(__FILE__) + '/Salesforce/rest/classes/user_profile_feed.rb'
 
 # OmniAuth/Salesforce Library
 require File.dirname(__FILE__) + '/Salesforce/oauth2/forcedotcom.rb'
+
+# Utility files
+require File.dirname(__FILE__) + '/Salesforce/rest/classes/asf_utility.rb'

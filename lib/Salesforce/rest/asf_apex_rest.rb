@@ -26,7 +26,7 @@ module Salesforce
     # In Force.com REST, there is no 's' at the end of SObjects
     # e.g.
     # set_collection_name "User"
-    class AsfRest
+    class AsfApexRest
       include HTTParty
 
       # default REST API server for HTTParty
