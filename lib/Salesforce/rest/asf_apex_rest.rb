@@ -26,56 +26,14 @@ module Salesforce
     # In Force.com REST, there is no 's' at the end of SObjects
     # e.g.
     # set_collection_name "User"
-    class AsfApexRest
-      include HTTParty
 
-      # default REST API server for HTTParty
-      base_uri "https://na7.salesforce.com"
-      default_params :output => 'json'
-      format :json
-      @@ssl_port = 443
-
-      # set header for httparty
-      def self.set_headers (auth_setting)
-        headers (auth_setting)
-      end
-
-      def self.set_collection_name(name)
-        @collection_name = name
-      end
-
-      # Loading the Authenticate module
-      require File.dirname(__FILE__) + '/asf_rest_authenticate.rb'
-      include Authenticate
-
-      # Loading the Call Remote module
-      require File.dirname(__FILE__) + '/asf_rest_call_rest_svr.rb'
-      include CallRemote
-
-      # Loading the OrgModel module
-      require File.dirname(__FILE__) + '/asf_rest_org_model.rb'
-      include OrgModel
-
-      # Loading the CachedCalls module
-      require File.dirname(__FILE__) + '/asf_rest_cached_calls.rb'
-      include CachedCalls
-
-      # We are mocking OAuth type authentication. In our case, we use the
-      # SessionID obtained from the initial SOAP Web Services call - 'login()'
-      # OAuth2 is geared toward website to website authentication.
-      # In our case, we are the background data interchange between RoR app and
-      # Force.com database. Therefore, we use security id.
-      # example:
-      # connection.set_header("Authorization",  'OAuth 00DA0000000XwIQ!AQIAQD_BX.pdxMz0YBKdkz45PijY0gMxH65JwvV6Yj4.hf44WJYqO9ug7DfhNbnxuO9buhbftiX9Qv5DyBLHauaJhqTh79vi')
-      #
-      # self.abstract_class = true
-      #
-      # Setup the adapter
+    # URL Path is http://<instance>.salesforce.com/services/apexrest
+    class AsfApexRest < AsfRest
       def self.setup(oauth_token, rest_svr, api_version)
         @@oauth_token = oauth_token
         @@rest_svr = rest_svr
         @@api_version = api_version ? api_version : "v21.0"  #take a dynamic api server version
-        @@rest_svr_url = rest_svr + "/services/data/#{api_version}/sobjects"
+        @@rest_svr_url = rest_svr + "/services/apexrest"
         @@ssl_port = 443  # TODO, right SF use port 443 for all HTTPS traffic.
 
         # To be used by HTTParty
@@ -105,7 +63,7 @@ module Salesforce
           rest_svr=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@rest_svr"),
           api_version=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@api_version"))
         class_name = self.class.name.gsub(/\S+::/mi, "")
-        path = "/services/data/#{api_version}/sobjects/#{class_name}/"
+        path = "/services/apexrest/#{class_name}/"
         target = rest_svr + path
         data = ActiveSupport::JSON::encode(attributes)
 
@@ -126,7 +84,7 @@ module Salesforce
           rest_svr=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@rest_svr"),
           api_version=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@api_version"))
         class_name = self.name.gsub(/\S+::/mi, "")
-        path = "/services/data/#{api_version}/sobjects/#{class_name}/#{id}"
+        path = "/services/apexrest/#{class_name}/#{id}"
         target = rest_svr + path
         resp = Salesforce::Rest::AsfRest::call_rest_svr("DELETE", target, header)
 
@@ -145,7 +103,7 @@ module Salesforce
           rest_svr=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@rest_svr"),
           api_version=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@api_version"))
         class_name = self.name.gsub(/\S+::/mi, "")
-        path = "/services/data/#{api_version}/sobjects/#{class_name}/#{id}"
+        path = "/services/apexrest/#{class_name}/#{id}"
         target = rest_svr + path
         resp = Salesforce::Rest::AsfRest::call_rest_svr("GET", target, header)
 
@@ -158,13 +116,6 @@ module Salesforce
         end
       end
 
-
-      #Custom object with PATCH method
-      class TrackRequest < Net::HTTPRequest
-        METHOD = 'PATCH'
-        REQUEST_HAS_BODY = true
-        RESPONSE_HAS_BODY = true
-      end
 
       #Update an object # TODO to use the call_rest_svr method
       def self.update(id, serialized_data_json, header=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@auth_header"),
@@ -180,7 +131,7 @@ module Salesforce
         http = Net::HTTP.new(svr_url_4_http, @@ssl_port)
         http.use_ssl = true
         class_name = self.name.gsub(/\S+::/mi, "")
-        path = "/services/data/#{api_version}/sobjects/#{class_name}/#{id}"
+        path = "/services/apexrest/#{class_name}/#{id}"
         code = serialized_data_json
         #   format -> Net::HTTPGenericRequest.new(m, reqbody, resbody, path, initheader)
         req = Net::HTTPGenericRequest.new("PATCH", true, true, path, header)
@@ -193,75 +144,6 @@ module Salesforce
         else
           return resp
         end
-      end
-
-      # Run SOQL, automatically CGI::escape the query for you.
-      def self.run_soql(query, header=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@auth_header"),
-          rest_svr=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@rest_svr"),
-          api_version=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@api_version"))
-        class_name = self.name.gsub(/\S+::/mi, "")
-        safe_query = CGI::escape(query)
-        path = "/services/data/#{api_version}/query?q=#{safe_query}"
-        target = rest_svr+path
-        resp = Salesforce::Rest::AsfRest::call_rest_svr("GET", target, header)
-        #resp = get(path, options)
-        if (resp.code != 200) || !resp.success?
-          message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
-          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code)
-        end
-        return resp
-      end
-
-      # Run SOQL, automatically CGI::escape the query for you.
-      # This is with given credentials -> query, security_token, rest_svr, version
-      # the path with appropriate api_version, CGI escaping the query string is
-      # included in this method.
-      def self.run_soql_with_credential(query, security_token, rest_svr, api_version)
-        header = { "Authorization" => "OAuth " + security_token, "content-Type" => 'application/json' }
-        #set the path with appropriate api_version, include CGI escaping the query string
-        safe_query = CGI::escape(query)
-        path = "/services/data/#{api_version}/query?q=#{safe_query}"
-        target = rest_svr + path
-        #get the result
-        resp = Salesforce::Rest::AsfRest::call_rest_svr("GET", target, header)
-        if (resp.code != 200) || !resp.success?
-          message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
-          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code)
-        end
-        return resp
-      end
-
-
-      # Run SOSL, do not use CGI::escape -> SF will complain about missing {braces}
-      def self.run_sosl(search, header=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@auth_header"),
-          rest_svr=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@rest_svr"),
-          api_version=Salesforce::Rest::AsfRest.send(:class_variable_get, "@@api_version"))
-        options = { :query => {:q => search}}
-        class_name = self.name.gsub(/\S+::/mi, "")
-        path = URI.escape("/services/data/#{api_version}/search/?q=#{search}")
-        target = rest_svr + path
-        resp = Salesforce::Rest::AsfRest::call_rest_svr("GET", target, header)
-        if (resp.code != 200) || !resp.success?
-          message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
-          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code)
-        end
-        return resp
-      end
-
-      # Run SOSL, do not use CGI::escape -> SF will complain about missing {braces}
-      # This is with given credentials -> Search_query, security_token, rest_svr, version
-      def self.run_sosl_with_credential(search, security_token, rest_svr, api_version)
-        header = { "Authorization" => "OAuth " + security_token, "content-Type" => 'application/json' }
-        #set the path with appropriate api_version, with the search string
-        path = URI.escape("/services/data/#{api_version}/search/?q=#{search}")
-        target = rest_svr + path
-        #get the result
-        resp = Salesforce::Rest::AsfRest::call_rest_svr("GET", target, header)
-        if (resp.code != 200) || !resp.success?
-          message = ActiveSupport::JSON.decode(resp.body)[0]["message"]
-          Salesforce::Rest::ErrorManager.raise_error("HTTP code " + resp.code.to_s + ": " + message, resp.code)
-        end
-        return resp
       end
 
     end
