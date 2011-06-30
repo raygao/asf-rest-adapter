@@ -62,4 +62,4 @@ require File.dirname(__FILE__) + '/Salesforce/rest/classes/user_profile_feed.rb'
 require File.dirname(__FILE__) + '/Salesforce/oauth2/forcedotcom.rb'
 
 # Utility files
-require File.dirname(__FILE__) + '/Salesforce/rest/classes/asf_utility.rb'
+require File.dirname(__FILE__) + '/Salesforce/rest/asf_utility.rb'
