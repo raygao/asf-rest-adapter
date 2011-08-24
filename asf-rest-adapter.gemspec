@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Raymond Gao @ Are4Us Technologies"]
-  s.date = %q{2011-06-03}
+  s.date = %q{2011-08-24}
   s.description = %q{REST based adapter for Salesforce}
   s.email = %q{raygao2000@yahoo.com}
   s.extra_rdoc_files = [
@@ -29,7 +29,6 @@ Gem::Specification.new do |s|
     "lib/.DS_Store",
     "lib/Salesforce/.DS_Store",
     "lib/Salesforce/oauth2/config_file/asf_rest_config.yml",
-    "lib/Salesforce/oauth2/enviornments/environment.rb",
     "lib/Salesforce/oauth2/forcedotcom.rb",
     "lib/Salesforce/oauth2/initializers/asf_rest_adapter.rb",
     "lib/Salesforce/oauth2/routes/routes.rb",
@@ -37,6 +36,7 @@ Gem::Specification.new do |s|
     "lib/Salesforce/oauth2/templates/ssl_templates/README",
     "lib/Salesforce/oauth2/templates/ssl_templates/server.crt",
     "lib/Salesforce/oauth2/templates/ssl_templates/server.key",
+    "lib/Salesforce/rest/asf_apex_rest.rb",
     "lib/Salesforce/rest/asf_connection.rb",
     "lib/Salesforce/rest/asf_rest.rb",
     "lib/Salesforce/rest/asf_rest_authenticate.rb",
@@ -44,6 +44,7 @@ Gem::Specification.new do |s|
     "lib/Salesforce/rest/asf_rest_call_rest_svr.rb",
     "lib/Salesforce/rest/asf_rest_error.rb",
     "lib/Salesforce/rest/asf_rest_org_model.rb",
+    "lib/Salesforce/rest/asf_utility.rb",
     "lib/Salesforce/rest/classes/account.rb",
     "lib/Salesforce/rest/classes/account_feed.rb",
     "lib/Salesforce/rest/classes/apex_log.rb",
@@ -88,6 +89,8 @@ Gem::Specification.new do |s|
     "nbproject/private/rake-d.txt",
     "nbproject/project.properties",
     "nbproject/project.xml",
+    "test/.DS_Store",
+    "test/asf-rest-adapter-rails-app/.DS_Store",
     "test/asf-rest-adapter-rails-app/.gitignore",
     "test/asf-rest-adapter-rails-app/Gemfile",
     "test/asf-rest-adapter-rails-app/Gemfile.lock",
@@ -149,15 +152,18 @@ Gem::Specification.new do |s|
     "test/asf-rest-adapter-rails-app/public/stylesheets/.gitkeep",
     "test/asf-rest-adapter-rails-app/public/stylesheets/scaffold.css",
     "test/asf-rest-adapter-rails-app/script/rails",
+    "test/asf-rest-adapter-rails-app/test/.DS_Store",
     "test/asf-rest-adapter-rails-app/test/fixtures/homes.yml",
     "test/asf-rest-adapter-rails-app/test/functional/homes_controller_test.rb",
     "test/asf-rest-adapter-rails-app/test/performance/browsing_test.rb",
     "test/asf-rest-adapter-rails-app/test/test_helper.rb",
+    "test/asf-rest-adapter-rails-app/test/unit/.DS_Store",
     "test/asf-rest-adapter-rails-app/test/unit/helpers/homes_helper_test.rb",
     "test/asf-rest-adapter-rails-app/test/unit/rest_create_delete.rb",
     "test/asf-rest-adapter-rails-app/test/unit/rest_find_for_an_user_test.rb",
     "test/asf-rest-adapter-rails-app/test/unit/rest_find_test.rb",
     "test/asf-rest-adapter-rails-app/test/unit/rest_update_resource.rb",
+    "test/asf-rest-adapter-rails-app/test/unit/salesforce/.DS_Store",
     "test/asf-rest-adapter-rails-app/test/unit/salesforce/account_feed_test.rb",
     "test/asf-rest-adapter-rails-app/test/unit/salesforce/account_test.rb",
     "test/asf-rest-adapter-rails-app/test/unit/salesforce/apex_log_test.rb",
@@ -167,6 +173,7 @@ Gem::Specification.new do |s|
     "test/asf-rest-adapter-rails-app/test/unit/salesforce/case_team_member_test.rb",
     "test/asf-rest-adapter-rails-app/test/unit/salesforce/case_team_role.rb",
     "test/asf-rest-adapter-rails-app/test/unit/salesforce/case_test.rb",
+    "test/asf-rest-adapter-rails-app/test/unit/salesforce/conference_test.rb",
     "test/asf-rest-adapter-rails-app/test/unit/salesforce/contact_feed_test.rb",
     "test/asf-rest-adapter-rails-app/test/unit/salesforce/contact_test.rb",
     "test/asf-rest-adapter-rails-app/test/unit/salesforce/contract_feed_test.rb",
@@ -203,7 +210,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/raygao/asf-rest-adapter}
   s.licenses = ["Apache 2.0"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.6.2}
+  s.rubygems_version = %q{1.3.6}
   s.summary = %q{REST based adapter for Salesforce}
   s.test_files = [
     "test/asf-rest-adapter-rails-app/app/controllers/application_controller.rb",
@@ -246,6 +253,7 @@ Gem::Specification.new do |s|
     "test/asf-rest-adapter-rails-app/test/unit/salesforce/case_team_member_test.rb",
     "test/asf-rest-adapter-rails-app/test/unit/salesforce/case_team_role.rb",
     "test/asf-rest-adapter-rails-app/test/unit/salesforce/case_test.rb",
+    "test/asf-rest-adapter-rails-app/test/unit/salesforce/conference_test.rb",
     "test/asf-rest-adapter-rails-app/test/unit/salesforce/contact_feed_test.rb",
     "test/asf-rest-adapter-rails-app/test/unit/salesforce/contact_test.rb",
     "test/asf-rest-adapter-rails-app/test/unit/salesforce/contract_feed_test.rb",
@@ -280,9 +288,10 @@ Gem::Specification.new do |s|
   ]
 
   if s.respond_to? :specification_version then
+    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
-    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
+    if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<rforce>, [">= 0"])
       s.add_runtime_dependency(%q<omniauth>, [">= 0"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0.0"])
